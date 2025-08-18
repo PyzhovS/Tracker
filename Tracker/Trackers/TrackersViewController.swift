@@ -3,23 +3,7 @@ import UIKit
 
 class TrackersViewController:UIViewController {
    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.bounds.width - 36) / 2
-        let coloredPartHeight: CGFloat = 90
-        let whitePartHeight: CGFloat = 58
-        return CGSize(width: width, height: coloredPartHeight + whitePartHeight)
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 40)
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
-    }
-    
-    
-    
+   
    private var categories: [TrackerCategory] = []
    private var completedTrackers: [TrackerRecord] = []
    private var currentDate = Date()
@@ -66,15 +50,12 @@ class TrackersViewController:UIViewController {
         collectionView.isHidden = isEmpty
     }
     
-    
-    
     private lazy var collectionView: UICollectionView = {
-        
         let layout = UICollectionViewFlowLayout()
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collection.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
-        collection.translatesAutoresizingMaskIntoConstraints = false
+  //      collection.translatesAutoresizingMaskIntoConstraints = false
         collection.dataSource = self
         collection.delegate = self
         return collection
@@ -86,7 +67,7 @@ class TrackersViewController:UIViewController {
         if let avatarImage = UIImage(named: "error") {
             imageView.image = avatarImage
         }
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+  //      imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
         
     }()
@@ -94,7 +75,7 @@ class TrackersViewController:UIViewController {
         let label = UILabel()
         label.text = "Трекеры"
         label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
+  //      label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.boldSystemFont(ofSize: 34)
         return label
     }()
@@ -106,7 +87,7 @@ class TrackersViewController:UIViewController {
         search.backgroundImage = UIImage()
         search.layer.cornerRadius = 10
         search.layer.masksToBounds = true
-        search.translatesAutoresizingMaskIntoConstraints = false
+ //       search.translatesAutoresizingMaskIntoConstraints = false
         return search
     }()
     
@@ -117,7 +98,7 @@ class TrackersViewController:UIViewController {
         picker.layer.cornerRadius = 8
         picker.layer.masksToBounds = true
         picker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
-        picker.translatesAutoresizingMaskIntoConstraints = false
+//        picker.translatesAutoresizingMaskIntoConstraints = false
         return picker
     }()
     
@@ -128,7 +109,7 @@ class TrackersViewController:UIViewController {
             button.setImage(addTracker, for: .normal)
         }
         button.tintColor = .black
-        button.translatesAutoresizingMaskIntoConstraints = false
+ //       button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -136,23 +117,34 @@ class TrackersViewController:UIViewController {
         let label = UILabel()
         label.text = "Что будем отслеживать?"
         label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
+    //    label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
     
     func setupUI() {
-        view.addSubview(placeholder)
-        view.addSubview(labelTitle)
-        view.addSubview(searchBar)
-        view.addSubview(addTracker)
-        view.addSubview(labelSearch)
-        view.addSubview(datePicker)
-        view.addSubview(collectionView)
+        [placeholder, labelTitle, searchBar, addTracker, labelSearch, datePicker, collectionView].forEach {$0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)}
+        
+        
         
         setupConstraint()
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = (collectionView.bounds.width - 36) / 2
+        let coloredPartHeight: CGFloat = 90
+        let whitePartHeight: CGFloat = 58
+        return CGSize(width: width, height: coloredPartHeight + whitePartHeight)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 40)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
+    }
     
     private func addTrackerRecord(trackerId: UUID) {
         let record = TrackerRecord(trackerId: trackerId, date: currentDate)
@@ -176,8 +168,7 @@ class TrackersViewController:UIViewController {
         currentDate = datePicker.date
         collectionView.reloadData()
     }
-    
-    
+        
     func setupConstraint() {
         NSLayoutConstraint.activate([
             
@@ -258,7 +249,6 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         ) as? HeaderView else {
             return UICollectionReusableView()
         }
-        
         header.titleLabel.text = categories[indexPath.section].title
         return header
     }
@@ -266,7 +256,6 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
 
 extension TrackersViewController {
     func didCreateTracker(_ tracker: Tracker, in categoryTitle: String) {
-        // Поиск категории или создание новой
         if let index = categories.firstIndex(where: { $0.title == categoryTitle }) {
             let category = categories[index]
             var trackers = category.trackers
