@@ -1,9 +1,3 @@
-//
-//  SceneDelegate.swift
-//  Tracker
-//
-//  Created by Sergey on 08.08.2025.
-//
 
 import UIKit
 
@@ -15,7 +9,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ViewController()
+        let tabBarController = AppTabBarController()
+        window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
       //  guard let _ = (scene as? UIWindowScene) else { return }
     }
