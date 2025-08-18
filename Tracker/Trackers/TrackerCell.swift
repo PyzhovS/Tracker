@@ -8,7 +8,6 @@ class TrackerCell: UICollectionViewCell {
         private let coloredView: UIView = {
             let view = UIView()
             view.layer.cornerRadius = 12
-
             view.clipsToBounds = true
             return view
         }()
