@@ -214,7 +214,7 @@ class TrackersViewController:UIViewController {
             placeholder.widthAnchor.constraint(equalToConstant: 80),
             placeholder.heightAnchor.constraint(equalToConstant: 80),
             
-            addTracker.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1),
+            addTracker.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 45),
             addTracker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 6),
             addTracker.widthAnchor.constraint(equalToConstant: 42),
             addTracker.heightAnchor.constraint(equalToConstant: 42),
