@@ -110,13 +110,14 @@ class TrackersViewController:UIViewController {
     }()
     
     private lazy var addTracker: UIButton = {
-        let button = UIButton()
-        button.accessibilityIdentifier = "addTracker"
-        if let addTracker = UIImage(named: "AddTracker") {
-            button.setImage(addTracker, for: .normal)
-        }
-        button.tintColor = .black
-        return button
+        let button = UIButton(type: .system)
+            if let image = UIImage(named: "AddTracker") {
+                button.setImage(image, for: .normal)
+            }
+            button.tintColor = .black
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.addTarget(self, action: #selector(addTrackerTapped), for: .touchUpInside)
+            return button
     }()
     
     private lazy var labelSearch: UILabel = {
@@ -128,12 +129,25 @@ class TrackersViewController:UIViewController {
     }()
     
     func setupUI() {
-        [placeholder, labelTitle, searchBar, addTracker, labelSearch, datePicker, collectionView].forEach {$0.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview($0)}
         
+        view.addSubview(collectionView)
+            view.addSubview(placeholder)
+            view.addSubview(labelSearch)
+            view.addSubview(searchBar)
+            view.addSubview(datePicker)
+            view.addSubview(labelTitle)
+            view.addSubview(addTracker)
         
-        
+        [placeholder, labelTitle, searchBar, addTracker, labelSearch, datePicker, collectionView].forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
         setupConstraint()
+    }
+    
+    
+    @objc private func addTrackerTapped() {
+        print("Кнопка нажата!")
+        let newTrackerVC = NewTrackerViewController()
+        let navVC = UINavigationController(rootViewController: newTrackerVC)
+        present(navVC, animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -158,6 +172,8 @@ class TrackersViewController:UIViewController {
             }
         }
     }
+    
+    
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 40)
@@ -198,7 +214,7 @@ class TrackersViewController:UIViewController {
             placeholder.widthAnchor.constraint(equalToConstant: 80),
             placeholder.heightAnchor.constraint(equalToConstant: 80),
             
-            addTracker.topAnchor.constraint(equalTo: view.topAnchor, constant: 45),
+            addTracker.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1),
             addTracker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 6),
             addTracker.widthAnchor.constraint(equalToConstant: 42),
             addTracker.heightAnchor.constraint(equalToConstant: 42),
