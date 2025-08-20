@@ -147,7 +147,7 @@ class TrackersViewController:UIViewController {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width: CGFloat = 167
+        let width: CGFloat = (collectionView.bounds.width - 48 ) / 2
         let coloredPartHeight: CGFloat = 90
         let whitePartHeight: CGFloat = 58
         return CGSize(width: width, height: coloredPartHeight + whitePartHeight)
