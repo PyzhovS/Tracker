@@ -2,58 +2,54 @@ import Foundation
 import UIKit
 
 class TrackersViewController:UIViewController {
-   
-   
-   private var categories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = [] {
-        didSet {
-            saveCompletedTrackers()
-        }
-    }
     
-   private var currentDate = Date()
+    
+    private var categories: [TrackerCategory] = []
+    private var completedTrackers: [TrackerRecord] = [] 
+    
+    private var currentDate = Date()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         loadData()
         UpdateUI()
-        loadCompletedTrackers()
+        
         
     }
     
     private func loadData() {
-          let sampleTrackers = [
-              Tracker(
-                  id: UUID(),
-                  title: "Поливать растения",
-                  emoji: "🌱",
-                  color: .systemGreen,
-                  schedule: [.monday, .wednesday, .friday]
-              ),
-              Tracker(
-                  id: UUID(),
-                  title: "Кошка заслоняла камеру",
-                  emoji: "🐱",
-                  color: .systemOrange,
-                  schedule: nil
-              ),
-              Tracker(
-                  id: UUID(),
-                  title: "Кошка заслоняла камеру",
-                  emoji: "🐱",
-                  color: .systemOrange,
-                  schedule: nil
-              )
-          ]
-          
-          categories = [
-              TrackerCategory(title: "Домашний уют", trackers: [sampleTrackers[2],sampleTrackers[0]]),
-              TrackerCategory(title: "Радостные мелочи", trackers: [sampleTrackers[1]])
-          ]
-          
+        let sampleTrackers = [
+            Tracker(
+                id: UUID(),
+                title: "Поливать растения",
+                emoji: "🌱",
+                color: .systemGreen,
+                schedule: [.monday, .wednesday, .friday]
+            ),
+            Tracker(
+                id: UUID(),
+                title: "Кошка заслоняла камеру",
+                emoji: "🐱",
+                color: .systemOrange,
+                schedule: nil
+            ),
+            Tracker(
+                id: UUID(),
+                title: "Кошка заслоняла камеру",
+                emoji: "🐱",
+                color: .systemOrange,
+                schedule: nil
+            )
+        ]
+        
+        categories = [
+            TrackerCategory(title: "Домашний уют", trackers: [sampleTrackers[2],sampleTrackers[0]]),
+            TrackerCategory(title: "Радостные мелочи", trackers: [sampleTrackers[1]])
+        ]
+        
         UpdateUI()
-      }
+    }
     
     private func UpdateUI() {
         let isEmpty = categories.isEmpty
@@ -89,7 +85,7 @@ class TrackersViewController:UIViewController {
         return label
     }()
     
- 
+    
     private lazy var searchBar: UISearchBar = {
         let search = UISearchBar()
         search.placeholder = "Поиск"
@@ -111,13 +107,13 @@ class TrackersViewController:UIViewController {
     
     private lazy var addTracker: UIButton = {
         let button = UIButton(type: .system)
-            if let image = UIImage(named: "AddTracker") {
-                button.setImage(image, for: .normal)
-            }
-            button.tintColor = .black
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.addTarget(self, action: #selector(addTrackerTapped), for: .touchUpInside)
-            return button
+        if let image = UIImage(named: "AddTracker") {
+            button.setImage(image, for: .normal)
+        }
+        button.tintColor = .black
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(addTrackerTapped), for: .touchUpInside)
+        return button
     }()
     
     private lazy var labelSearch: UILabel = {
@@ -131,12 +127,12 @@ class TrackersViewController:UIViewController {
     func setupUI() {
         
         view.addSubview(collectionView)
-            view.addSubview(placeholder)
-            view.addSubview(labelSearch)
-            view.addSubview(searchBar)
-            view.addSubview(datePicker)
-            view.addSubview(labelTitle)
-            view.addSubview(addTracker)
+        view.addSubview(placeholder)
+        view.addSubview(labelSearch)
+        view.addSubview(searchBar)
+        view.addSubview(datePicker)
+        view.addSubview(labelTitle)
+        view.addSubview(addTracker)
         
         [placeholder, labelTitle, searchBar, addTracker, labelSearch, datePicker, collectionView].forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
         setupConstraint()
@@ -157,28 +153,14 @@ class TrackersViewController:UIViewController {
         return CGSize(width: width, height: coloredPartHeight + whitePartHeight)
     }
     
-    private func saveCompletedTrackers() {
-        let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(completedTrackers) {
-            UserDefaults.standard.set(encoded, forKey: "completedTrackers")
-        }
-    }
-
-    private func loadCompletedTrackers() {
-        if let data = UserDefaults.standard.data(forKey: "completedTrackers") {
-            let decoder = JSONDecoder()
-            if let decoded = try? decoder.decode([TrackerRecord].self, from: data) {
-                completedTrackers = decoded
-            }
-        }
-    }
     
     
-
+    
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 40)
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
     }
@@ -205,7 +187,7 @@ class TrackersViewController:UIViewController {
         currentDate = datePicker.date
         collectionView.reloadData()
     }
-        
+    
     func setupConstraint() {
         NSLayoutConstraint.activate([
             
@@ -214,7 +196,7 @@ class TrackersViewController:UIViewController {
             placeholder.widthAnchor.constraint(equalToConstant: 80),
             placeholder.heightAnchor.constraint(equalToConstant: 80),
             
-            addTracker.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 45),
+            addTracker.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1),
             addTracker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 6),
             addTracker.widthAnchor.constraint(equalToConstant: 42),
             addTracker.heightAnchor.constraint(equalToConstant: 42),
@@ -228,7 +210,7 @@ class TrackersViewController:UIViewController {
             searchBar.topAnchor.constraint(equalTo: labelTitle.bottomAnchor, constant: 7),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-             
+            
             collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -259,21 +241,21 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         let completedDays = completedTrackers.filter { $0.trackerId == tracker.id }.count
         
         cell.configure(
-                    with: tracker.title,
-                    emoji: tracker.emoji,
-                    color: tracker.color,
-                    completedDays: completedDays,
-                    isCompleted: isCompleted,
-                    isActive: canCompleteTracker(for: currentDate)
-                )
+            with: tracker.title,
+            emoji: tracker.emoji,
+            color: tracker.color,
+            completedDays: completedDays,
+            isCompleted: isCompleted,
+            isActive: canCompleteTracker(for: currentDate)
+        )
         cell.completionHandler = { [weak self] in
-                guard let self = self else { return }
-                if isCompleted {
-                    self.removeTrackerRecord(trackerId: tracker.id)
-                } else {
-                    self.addTrackerRecord(trackerId: tracker.id)
-                }
+            guard let self = self else { return }
+            if isCompleted {
+                self.removeTrackerRecord(trackerId: tracker.id)
+            } else {
+                self.addTrackerRecord(trackerId: tracker.id)
             }
+        }
         
         return cell
     }
