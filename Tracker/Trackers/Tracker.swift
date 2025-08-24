@@ -2,20 +2,37 @@ import Foundation
 import UIKit
 
 struct Tracker {
-        let id: UUID
-        let title: String
-        let emoji: String
-        let color: UIColor
-        let schedule: [WeekDay]?
-    }
-    
+    let id: UUID
+    let title: String
+    let emoji: String
+    let color: UIColor
+    let schedule: [WeekDay]?
+}
+
 
 enum WeekDay: Int, CaseIterable {
     case monday = 1
-    case tuesday
-    case wednesday
-    case thursday
-    case friday
-    case saturday
-    case sunday
+    case tuesday = 2
+    case wednesday = 3
+    case thursday = 4
+    case friday = 5
+    case saturday = 6
+    case sunday = 7
+    
+    var numberValue: Int {
+        return self.rawValue
+    }
+    
+    // Дополнительно можно добавить локализованные названия
+    var displayName: String {
+        switch self {
+        case .monday: return "Понедельник"
+        case .tuesday: return "Вторник"
+        case .wednesday: return "Среда"
+        case .thursday: return "Четверг"
+        case .friday: return "Пятница"
+        case .saturday: return "Суббота"
+        case .sunday: return "Воскресенье"
+        }
+    }
 }

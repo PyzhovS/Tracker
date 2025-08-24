@@ -4,9 +4,12 @@ class NewTrackerViewController: UIViewController {
     
     // MARK: - Properties
     private let menuItems = ["Категория", "Расписание"]
+    var onTrackerCreated: ((Tracker, String) -> Void)?
+    private var currentSchedule: [WeekDay] = []
+    
     
     // MARK: - UI Elements
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Новая привычка"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -15,7 +18,7 @@ class NewTrackerViewController: UIViewController {
         return label
     }()
     
-    private let nameTextField: UITextField = {
+    private lazy var nameTextField: UITextField = {
         let field = UITextField()
         field.placeholder = "Введите название трекера"
         field.backgroundColor = .backgroundDay
@@ -55,7 +58,7 @@ class NewTrackerViewController: UIViewController {
         return button
     }()
     
-    private let createButton: UIButton = {
+    private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Создать", for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -67,7 +70,7 @@ class NewTrackerViewController: UIViewController {
         return button
     }()
     
-    private let buttonsStack: UIStackView = {
+    private lazy var buttonsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 8
@@ -126,17 +129,33 @@ class NewTrackerViewController: UIViewController {
     }
     
     @objc private func textFieldDidChange() {
-        let isNameEntered = !(nameTextField.text?.isEmpty ?? true)
+        let maxTex = 38
+        var isNameEntered = !(nameTextField.text?.isEmpty ?? true)
+        if nameTextField.text?.count ?? 0 > maxTex {
+            isNameEntered = false
+        }
         createButton.isEnabled = isNameEntered
         createButton.backgroundColor = isNameEntered ? .black : .gray
     }
     
     @objc private func cancelButtonTapped() {
+        
         dismiss(animated: true)
     }
     
     @objc private func createButtonTapped() {
-        dismiss(animated: true)
+        guard let name = nameTextField.text, !name.isEmpty else { return }
+           
+           let newTracker = Tracker(
+               id: UUID(),
+               title: name,
+               emoji: "🟢",
+               color: .systemBlue,
+               schedule: currentSchedule// Будет заполнено в ScheduleSelectionViewController
+           )
+           
+           onTrackerCreated?(newTracker, "Разное")
+           dismiss(animated: true)
     }
     
     @objc private func categoryButtonTapped() {
@@ -145,6 +164,26 @@ class NewTrackerViewController: UIViewController {
     }
     
     @objc private func scheduleButtonTapped() {
+        let scheduleVC = ScheduleSelectionViewController()
+           
+           scheduleVC.onScheduleSelected = { [weak self] selectedDays in
+               // НЕ сохраняем в currentSchedule, сразу обновляем интерфейс
+               let scheduleText = selectedDays.isEmpty ? "Расписание" :
+                   selectedDays.map { $0.displayName }.joined(separator: ", ")
+               
+               // Обновляем ячейку таблицы
+               if let cell = self?.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) {
+                   cell.detailTextLabel?.text = scheduleText
+                   cell.detailTextLabel?.textColor = .gray
+                   cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 14)
+               }
+               
+               // Сохраняем выбранные дни только при создании трекера
+               self?.currentSchedule = selectedDays // Если нужно для создания
+           }
+           
+           let navVC = UINavigationController(rootViewController: scheduleVC)
+           present(navVC, animated: true)
         print("Расписание tapped")
     }
 }
@@ -163,10 +202,15 @@ extension NewTrackerViewController: UITableViewDataSource, UITableViewDelegate {
         cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
         cell.backgroundColor = .clear
         cell.accessoryType = .disclosureIndicator
-        cell.selectionStyle = .gray
         
-        if indexPath.row == menuItems.count - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        // Для ячейки расписания показываем выбранные дни
+        if indexPath.row == 1 && !currentSchedule.isEmpty {
+            let selectedDaysText = currentSchedule.map { $0.displayName }.joined(separator: ", ")
+            cell.detailTextLabel?.text = selectedDaysText
+            cell.detailTextLabel?.textColor = .gray
+            cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 14)
+        } else {
+            cell.detailTextLabel?.text = nil
         }
         
         return cell
