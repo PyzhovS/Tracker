@@ -6,14 +6,12 @@ class ScheduleCell: UITableViewCell {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let switchControl: UISwitch = {
         let switchControl = UISwitch()
-        switchControl.onTintColor = .trblue
-        switchControl.translatesAutoresizingMaskIntoConstraints = false
+        switchControl.onTintColor = .ypBlue
         return switchControl
     }()
     
@@ -30,9 +28,11 @@ class ScheduleCell: UITableViewCell {
     
     private func setupUI() {
         backgroundColor = .backgroundDay
-        
         contentView.addSubview(titleLabel)
         contentView.addSubview(switchControl)
+        [titleLabel, switchControl].forEach{
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
         
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),

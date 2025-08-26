@@ -14,7 +14,6 @@ class NewTrackerViewController: UIViewController {
         label.text = "Новая привычка"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -27,7 +26,6 @@ class NewTrackerViewController: UIViewController {
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
         field.leftViewMode = .always
         field.font = UIFont.systemFont(ofSize: 17)
-        field.translatesAutoresizingMaskIntoConstraints = false
         return field
     }()
     
@@ -41,7 +39,6 @@ class NewTrackerViewController: UIViewController {
         table.backgroundColor = .backgroundDay
         table.delegate = self
         table.dataSource = self
-        table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
@@ -54,7 +51,6 @@ class NewTrackerViewController: UIViewController {
         button.layer.cornerRadius = 16
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.red.cgColor
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -66,7 +62,6 @@ class NewTrackerViewController: UIViewController {
         button.backgroundColor = .gray
         button.layer.cornerRadius = 16
         button.isEnabled = false
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -75,7 +70,6 @@ class NewTrackerViewController: UIViewController {
         stack.axis = .horizontal
         stack.spacing = 8
         stack.distribution = .fillEqually
-        stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
     
@@ -90,14 +84,14 @@ class NewTrackerViewController: UIViewController {
     // MARK: - Private Methods
     private func setupUI() {
         view.backgroundColor = .white
-        
         view.addSubview(titleLabel)
         view.addSubview(nameTextField)
         view.addSubview(tableView)
-        
         buttonsStack.addArrangedSubview(cancelButton)
         buttonsStack.addArrangedSubview(createButton)
         view.addSubview(buttonsStack)
+        [titleLabel, nameTextField, tableView, cancelButton, createButton, buttonsStack].forEach
+        {$0.translatesAutoresizingMaskIntoConstraints = false}
     }
     
     private func setupConstraints() {

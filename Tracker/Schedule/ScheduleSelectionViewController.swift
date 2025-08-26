@@ -15,7 +15,6 @@ class ScheduleSelectionViewController: UIViewController {
         label.text = "Расписание"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -29,7 +28,6 @@ class ScheduleSelectionViewController: UIViewController {
         table.backgroundColor = .systemBackground
         table.delegate = self
         table.dataSource = self
-        table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
@@ -40,7 +38,6 @@ class ScheduleSelectionViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .black
         button.layer.cornerRadius = 16
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -55,11 +52,12 @@ class ScheduleSelectionViewController: UIViewController {
     // MARK: - Private Methods
     private func setupUI() {
         view.backgroundColor = .white
-        
         view.addSubview(titleLabel)
         view.addSubview(tableView)
         view.addSubview(doneButton)
-    }
+        [titleLabel, tableView, doneButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false}
+        }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
