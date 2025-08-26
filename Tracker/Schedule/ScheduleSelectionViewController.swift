@@ -88,16 +88,16 @@ class ScheduleSelectionViewController: UIViewController {
     }
     
     private func dayName(for day: WeekDay) -> String {
-            switch day {
-            case .monday: return "Понедельник"
-            case .tuesday: return "Вторник"
-            case .wednesday: return "Среда"
-            case .thursday: return "Четверг"
-            case .friday: return "Пятница"
-            case .saturday: return "Суббота"
-            case .sunday: return "Воскресенье"
-            }
+        switch day {
+        case .monday: return "Понедельник"
+        case .tuesday: return "Вторник"
+        case .wednesday: return "Среда"
+        case .thursday: return "Четверг"
+        case .friday: return "Пятница"
+        case .saturday: return "Суббота"
+        case .sunday: return "Воскресенье"
         }
+    }
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
@@ -127,10 +127,10 @@ extension ScheduleSelectionViewController: UITableViewDataSource, UITableViewDel
         }
         
         if indexPath.row == daysOfWeek.count - 1 {
-                    cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-                } else {
-                    cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-                }
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        } else {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        }
         
         return cell
     }
@@ -139,7 +139,7 @@ extension ScheduleSelectionViewController: UITableViewDataSource, UITableViewDel
         return 75
     }
     
-     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let cornerRadius: CGFloat = 16
         var corners: UIRectCorner = []
         

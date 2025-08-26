@@ -1,7 +1,7 @@
 import UIKit
 
 class AppTabBarController: UITabBarController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewControllers()
@@ -10,10 +10,10 @@ class AppTabBarController: UITabBarController {
     func setupViewControllers() {
         let trackerController = TrackersViewController()
         let firstVC = createNavController(for: trackerController,
-                                         title: "Трекеры",
+                                          title: "Трекеры",
                                           image: UIImage(named: "tab1")!)
         let thirdVC = createNavController(for: ThirdViewController(),
-                                        title: "Статистика",
+                                          title: "Статистика",
                                           image: UIImage(named: "tab2")!)
         
         viewControllers = [firstVC, thirdVC]
@@ -25,13 +25,13 @@ class AppTabBarController: UITabBarController {
         if #available(iOS 13.0, *) {
             let appearance = UITabBarAppearance()
             appearance.shadowColor = .black
-             tabBar.scrollEdgeAppearance = appearance
+            tabBar.scrollEdgeAppearance = appearance
         }
     }
-        
+    
     private func createNavController(for rootViewController: UIViewController,
-                                    title: String,
-                                    image: UIImage) -> UIViewController {
+                                     title: String,
+                                     image: UIImage) -> UIViewController {
         let navController = UINavigationController(rootViewController: rootViewController)
         navController.tabBarItem.title = title
         navController.tabBarItem.image = image

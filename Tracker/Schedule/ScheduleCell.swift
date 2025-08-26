@@ -52,7 +52,5 @@ class ScheduleCell: UITableViewCell {
     func configure(with title: String, isSelected: Bool) {
         titleLabel.text = title
         switchControl.isOn = isSelected
-        
-        
     }
 }

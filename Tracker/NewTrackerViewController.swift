@@ -145,17 +145,17 @@ class NewTrackerViewController: UIViewController {
     
     @objc private func createButtonTapped() {
         guard let name = nameTextField.text, !name.isEmpty else { return }
-           
-           let newTracker = Tracker(
-               id: UUID(),
-               title: name,
-               emoji: "🟢",
-               color: .systemBlue,
-               schedule: currentSchedule
-           )
-           
-           onTrackerCreated?(newTracker, "Разное")
-           dismiss(animated: true)
+        
+        let newTracker = Tracker(
+            id: UUID(),
+            title: name,
+            emoji: "🟢",
+            color: .systemBlue,
+            schedule: currentSchedule
+        )
+        
+        onTrackerCreated?(newTracker, "Разное")
+        dismiss(animated: true)
     }
     
     @objc private func categoryButtonTapped() {
@@ -165,19 +165,19 @@ class NewTrackerViewController: UIViewController {
     
     @objc private func scheduleButtonTapped() {
         let scheduleVC = ScheduleSelectionViewController()
-           scheduleVC.onScheduleSelected = { [weak self] selectedDays in
-               let scheduleText = selectedDays.isEmpty ? "Расписание" :
-                   selectedDays.map { $0.displayName }.joined(separator: ", ")
-               if let cell = self?.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) {
-                   cell.detailTextLabel?.text = scheduleText
-                   cell.detailTextLabel?.textColor = .gray
-                   cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 14)
-               }
-               self?.currentSchedule = selectedDays
-           }
-           
-           let navVC = UINavigationController(rootViewController: scheduleVC)
-           present(navVC, animated: true)
+        scheduleVC.onScheduleSelected = { [weak self] selectedDays in
+            let scheduleText = selectedDays.isEmpty ? "Расписание" :
+            selectedDays.map { $0.displayName }.joined(separator: ", ")
+            if let cell = self?.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) {
+                cell.detailTextLabel?.text = scheduleText
+                cell.detailTextLabel?.textColor = .gray
+                cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 14)
+            }
+            self?.currentSchedule = selectedDays
+        }
+        
+        let navVC = UINavigationController(rootViewController: scheduleVC)
+        present(navVC, animated: true)
         print("Расписание tapped")
     }
 }

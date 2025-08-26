@@ -107,10 +107,10 @@ class TrackersViewController:UIViewController {
     
     @objc private func addTrackerTapped() {
         let newTrackerVC = NewTrackerViewController()
-            newTrackerVC.onTrackerCreated = { [weak self] tracker, category in
-                self?.didCreateTracker(tracker, in: category)
-            }
-            present(UINavigationController(rootViewController: newTrackerVC), animated: true)
+        newTrackerVC.onTrackerCreated = { [weak self] tracker, category in
+            self?.didCreateTracker(tracker, in: category)
+        }
+        present(UINavigationController(rootViewController: newTrackerVC), animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -154,7 +154,7 @@ class TrackersViewController:UIViewController {
         currentDate = datePicker.date
         filterTrackersBySelectedDate()
     }
-
+    
     private func filterTrackersBySelectedDate() {
         let calendar = Calendar.current
         let selectedWeekday = calendar.component(.weekday, from: currentDate)
@@ -213,12 +213,12 @@ class TrackersViewController:UIViewController {
 }
 extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-            return visibleCategories.count
-        }
+        return visibleCategories.count
+    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return visibleCategories[section].trackers.count 
-        }
+        return visibleCategories[section].trackers.count 
+    }
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
