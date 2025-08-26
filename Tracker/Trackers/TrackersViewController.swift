@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-class TrackersViewController:UIViewController {
+class TrackersViewController:UIViewController, UISearchBarDelegate {
     
     private var visibleCategories: [TrackerCategory] = []
     private var categories: [TrackerCategory] = []
@@ -57,6 +57,9 @@ class TrackersViewController:UIViewController {
         search.backgroundImage = UIImage()
         search.layer.cornerRadius = 10
         search.layer.masksToBounds = true
+        search.delegate = self
+        search.returnKeyType = .done
+        search.enablesReturnKeyAutomatically = false
         return search
     }()
     
