@@ -12,48 +12,12 @@ class TrackersViewController:UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-   //     loadData()
         UpdateUI()
         filterTrackersBySelectedDate()
-        
-        
-    }
-    
-    private func loadData() {
-        let sampleTrackers = [
-            Tracker(
-                id: UUID(),
-                title: "Поливать растения",
-                emoji: "🌱",
-                color: .systemGreen,
-                schedule: [.monday, .wednesday, .friday]
-            ),
-            Tracker(
-                id: UUID(),
-                title: "Кошка заслоняла камеру",
-                emoji: "🐱",
-                color: .systemOrange,
-                schedule: nil
-            ),
-            Tracker(
-                id: UUID(),
-                title: "Кошка заслоняла камеру",
-                emoji: "🐱",
-                color: .systemOrange,
-                schedule: nil
-            )
-        ]
-        
-        categories = [
-            TrackerCategory(title: "Домашний уют", trackers: [sampleTrackers[2],sampleTrackers[0]]),
-            TrackerCategory(title: "Радостные мелочи", trackers: [sampleTrackers[1]])
-        ]
-        
-        UpdateUI()
     }
     
     private func UpdateUI() {
-        let isEmpty = visibleCategories.isEmpty // Проверяем отфильтрованные категории
+        let isEmpty = visibleCategories.isEmpty
         placeholder.isHidden = !isEmpty
         labelSearch.isHidden = !isEmpty
         collectionView.isHidden = isEmpty
@@ -100,6 +64,7 @@ class TrackersViewController:UIViewController {
         let picker = UIDatePicker()
         picker.preferredDatePickerStyle = .compact
         picker.datePickerMode = .date
+        picker.locale = Locale(identifier: "ru_Ru")
         picker.layer.cornerRadius = 8
         picker.layer.masksToBounds = true
         picker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
@@ -248,11 +213,11 @@ class TrackersViewController:UIViewController {
 }
 extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-            return visibleCategories.count // Используем отфильтрованные категории
+            return visibleCategories.count
         }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return visibleCategories[section].trackers.count // Используем отфильтрованные трекеры
+            return visibleCategories[section].trackers.count 
         }
     
     
@@ -303,9 +268,12 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
 extension TrackersViewController {
     func didCreateTracker(_ tracker: Tracker, in categoryTitle: String) {
         if let index = categories.firstIndex(where: { $0.title == categoryTitle }) {
-            var category = categories[index]
-            category.trackers.append(tracker)
-            categories[index] = category
+            let existingCategory = categories[index]
+            let updatedCategory = TrackerCategory(
+                title: existingCategory.title,
+                trackers: existingCategory.trackers + [tracker]
+            )
+            categories[index] = updatedCategory
         } else {
             let newCategory = TrackerCategory(title: categoryTitle, trackers: [tracker])
             categories.append(newCategory)

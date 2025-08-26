@@ -117,7 +117,7 @@ class NewTrackerViewController: UIViewController {
             
             buttonsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             buttonsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            buttonsStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            buttonsStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
             buttonsStack.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
@@ -151,7 +151,7 @@ class NewTrackerViewController: UIViewController {
                title: name,
                emoji: "🟢",
                color: .systemBlue,
-               schedule: currentSchedule// Будет заполнено в ScheduleSelectionViewController
+               schedule: currentSchedule
            )
            
            onTrackerCreated?(newTracker, "Разное")
@@ -165,21 +165,15 @@ class NewTrackerViewController: UIViewController {
     
     @objc private func scheduleButtonTapped() {
         let scheduleVC = ScheduleSelectionViewController()
-           
            scheduleVC.onScheduleSelected = { [weak self] selectedDays in
-               // НЕ сохраняем в currentSchedule, сразу обновляем интерфейс
                let scheduleText = selectedDays.isEmpty ? "Расписание" :
                    selectedDays.map { $0.displayName }.joined(separator: ", ")
-               
-               // Обновляем ячейку таблицы
                if let cell = self?.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) {
                    cell.detailTextLabel?.text = scheduleText
                    cell.detailTextLabel?.textColor = .gray
                    cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 14)
                }
-               
-               // Сохраняем выбранные дни только при создании трекера
-               self?.currentSchedule = selectedDays // Если нужно для создания
+               self?.currentSchedule = selectedDays
            }
            
            let navVC = UINavigationController(rootViewController: scheduleVC)
@@ -202,8 +196,6 @@ extension NewTrackerViewController: UITableViewDataSource, UITableViewDelegate {
         cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
         cell.backgroundColor = .clear
         cell.accessoryType = .disclosureIndicator
-        
-        // Для ячейки расписания показываем выбранные дни
         if indexPath.row == 1 && !currentSchedule.isEmpty {
             let selectedDaysText = currentSchedule.map { $0.displayName }.joined(separator: ", ")
             cell.detailTextLabel?.text = selectedDaysText
