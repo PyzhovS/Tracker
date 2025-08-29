@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-class ScheduleSelectionViewController: UIViewController {
+final class ScheduleSelectionViewController: UIViewController {
     
     // MARK: - Properties
     var selectedDays: [WeekDay] = []
@@ -24,6 +24,7 @@ class ScheduleSelectionViewController: UIViewController {
         table.isScrollEnabled = true
         table.layer.cornerRadius = 16
         table.layer.masksToBounds = true
+        table.allowsSelection = false
         table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         table.backgroundColor = .systemBackground
         table.delegate = self
@@ -55,9 +56,12 @@ class ScheduleSelectionViewController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(tableView)
         view.addSubview(doneButton)
-        [titleLabel, tableView, doneButton].forEach {
+        
+        [titleLabel,
+         tableView,
+         doneButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false}
-        }
+    }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
@@ -85,17 +89,7 @@ class ScheduleSelectionViewController: UIViewController {
         dismiss(animated: true)
     }
     
-    private func dayName(for day: WeekDay) -> String {
-        switch day {
-        case .monday: return "Понедельник"
-        case .tuesday: return "Вторник"
-        case .wednesday: return "Среда"
-        case .thursday: return "Четверг"
-        case .friday: return "Пятница"
-        case .saturday: return "Суббота"
-        case .sunday: return "Воскресенье"
-        }
-    }
+    
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
@@ -111,10 +105,9 @@ extension ScheduleSelectionViewController: UITableViewDataSource, UITableViewDel
         }
         
         let day = daysOfWeek[indexPath.row]
-        let dayName = dayName(for: day)
         let isSelected = selectedDays.contains(day)
         
-        cell.configure(with: dayName, isSelected: isSelected)
+        cell.configure(with: day.displayName, isSelected: isSelected)
         
         cell.switchValueChanged = { [weak self] isOn in
             if isOn {

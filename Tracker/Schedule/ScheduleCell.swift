@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-class ScheduleCell: UITableViewCell {
+final class ScheduleCell: UITableViewCell {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()

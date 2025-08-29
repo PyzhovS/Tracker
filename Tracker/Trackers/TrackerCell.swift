@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-class TrackerCell: UICollectionViewCell {
+final class TrackerCell: UICollectionViewCell {
     var completionHandler: (() -> Void)?
     
     // MARK: - UI Elements
@@ -41,7 +41,6 @@ class TrackerCell: UICollectionViewCell {
         let button = UIButton()
         button.tintColor = .white
         button.layer.cornerRadius = 17
-        button.backgroundColor = UIColor(white: 1, alpha: 0.3)
         button.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -63,7 +62,11 @@ class TrackerCell: UICollectionViewCell {
         contentView.layer.cornerRadius = 12
         contentView.clipsToBounds = true
         
-        [coloredView, emojiLabel, titleLabel, daysLabel, plusButton].forEach {
+        [coloredView,
+         emojiLabel,
+         titleLabel,
+         daysLabel,
+         plusButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }

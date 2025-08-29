@@ -1,11 +1,11 @@
 import Foundation
 import UIKit
 
-class TrackersViewController:UIViewController, UISearchBarDelegate {
+final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     private var visibleCategories: [TrackerCategory] = []
     private var categories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = [] 
+    private var completedTrackers: [TrackerRecord] = []
     
     private var currentDate = Date()
     
@@ -31,7 +31,6 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
         collection.dataSource = self
         collection.delegate = self
         return collection
-        
     }()
     
     private lazy var placeholder: UIImageView = {
@@ -40,8 +39,8 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
             imageView.image = avatarImage
         }
         return imageView
-        
     }()
+    
     private lazy var labelTitle: UILabel = {
         let label = UILabel()
         label.text = "Трекеры"
@@ -49,7 +48,6 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
         label.font = UIFont.boldSystemFont(ofSize: 34)
         return label
     }()
-    
     
     private lazy var searchBar: UISearchBar = {
         let search = UISearchBar()
@@ -67,7 +65,6 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
         let picker = UIDatePicker()
         picker.preferredDatePickerStyle = .compact
         picker.datePickerMode = .date
-        picker.locale = Locale(identifier: "ru_Ru")
         picker.layer.cornerRadius = 8
         picker.layer.masksToBounds = true
         picker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
@@ -94,7 +91,6 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
     }()
     
     func setupUI() {
-        
         view.addSubview(collectionView)
         view.addSubview(placeholder)
         view.addSubview(labelSearch)
@@ -103,10 +99,16 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
         view.addSubview(labelTitle)
         view.addSubview(addTracker)
         
-        [placeholder, labelTitle, searchBar, addTracker, labelSearch, datePicker, collectionView].forEach {$0.translatesAutoresizingMaskIntoConstraints = false}
+        [placeholder,
+         labelTitle,
+         searchBar,
+         addTracker,
+         labelSearch,
+         datePicker,
+         collectionView].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        
         setupConstraint()
     }
-    
     
     @objc private func addTrackerTapped() {
         let newTrackerVC = NewTrackerViewController()
@@ -114,25 +116,6 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
             self?.didCreateTracker(tracker, in: category)
         }
         present(UINavigationController(rootViewController: newTrackerVC), animated: true)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width: CGFloat = (collectionView.bounds.width - 48 ) / 2
-        let coloredPartHeight: CGFloat = 90
-        let whitePartHeight: CGFloat = 58
-        return CGSize(width: width, height: coloredPartHeight + whitePartHeight)
-    }
-    
-    
-    
-    
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 40)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
     }
     
     private func addTrackerRecord(trackerId: UUID) {
@@ -149,8 +132,9 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
     private func isTrackerCompletedToday(trackerId: UUID) -> Bool {
         completedTrackers.contains { $0.trackerId == trackerId && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
     }
+    
     private func canCompleteTracker(for date: Date) -> Bool {
-        return Calendar.current.isDate(date, inSameDayAs: Date())
+        return date <= Date()
     }
     
     @objc private func dateChanged() {
@@ -182,7 +166,6 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
     
     func setupConstraint() {
         NSLayoutConstraint.activate([
-            
             placeholder.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             placeholder.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             placeholder.widthAnchor.constraint(equalToConstant: 80),
@@ -200,8 +183,8 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
             labelTitle.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             
             searchBar.topAnchor.constraint(equalTo: labelTitle.bottomAnchor, constant: 7),
-            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 9),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -9),
             
             collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -210,19 +193,18 @@ class TrackersViewController:UIViewController, UISearchBarDelegate {
             
             labelSearch.topAnchor.constraint(equalTo: placeholder.bottomAnchor, constant: 8),
             labelSearch.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            
         ])
     }
 }
+
 extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return visibleCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return visibleCategories[section].trackers.count 
+        return visibleCategories[section].trackers.count
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as? TrackerCell else {
@@ -241,6 +223,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
             isCompleted: isCompleted,
             isActive: canCompleteTracker(for: currentDate)
         )
+        
         cell.completionHandler = { [weak self] in
             guard let self = self else { return }
             if isCompleted {
@@ -253,8 +236,6 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         return cell
     }
     
-    
-    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let header = collectionView.dequeueReusableSupplementaryView(
             ofKind: kind,
@@ -265,6 +246,44 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         }
         header.titleLabel.text = visibleCategories[indexPath.section].title
         return header
+    }
+    
+    // MARK: - UICollectionViewDelegateFlowLayout
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let section = visibleCategories[indexPath.section]
+        let itemsCount = section.trackers.count
+        let coloredSectionHeight: CGFloat = 90
+        let infoSectionHeight: CGFloat = 58
+        let cellHeight = coloredSectionHeight + infoSectionHeight
+        let availableWidth = collectionView.bounds.width - 41
+        let cellWidth = availableWidth / 2
+        
+        return CGSize(width: cellWidth, height: cellHeight)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        let itemsCount = visibleCategories[section].trackers.count
+        
+        if itemsCount == 1 {
+            let cellWidth = (collectionView.bounds.width - 41) / 2
+            let extraRightInset = collectionView.bounds.width - 16 - cellWidth - 16
+            return UIEdgeInsets(top: 0, left: 16, bottom: 9, right: extraRightInset)
+        } else {
+            return UIEdgeInsets(top: 0, left: 16, bottom: 9, right: 16)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 9
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 9
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 40)
     }
 }
 
