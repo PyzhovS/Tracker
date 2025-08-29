@@ -2,7 +2,7 @@ import UIKit
 import Foundation
 
 class CustomTableViewCell: UITableViewCell {
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17)
         return label
@@ -44,10 +44,11 @@ class CustomTableViewCell: UITableViewCell {
         contentView.addSubview(accessoryImageView)
         contentView.addSubview(separatorView)
         
-        separatorView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        accessoryImageView.translatesAutoresizingMaskIntoConstraints = false
+        [separatorView,
+         titleLabel,
+         subtitleLabel,
+         accessoryImageView].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false }
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
