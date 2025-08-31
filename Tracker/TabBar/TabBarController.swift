@@ -1,41 +1,48 @@
 import UIKit
 
 class AppTabBarController: UITabBarController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewControllers()
+        setupTabBarAppearance()
     }
     
     func setupViewControllers() {
         let trackerController = TrackersViewController()
         let firstVC = createNavController(for: trackerController,
-                                         title: "Трекеры",
-                                          image: UIImage(named: "tab1")!)
+                                          title: "Трекеры",
+                                          image: UIImage(resource: .tab1))
         let thirdVC = createNavController(for: ThirdViewController(),
-                                        title: "Статистика",
-                                          image: UIImage(named: "tab2")!)
+                                          title: "Статистика",
+                                          image: UIImage(resource: .tab2))
         
         viewControllers = [firstVC, thirdVC]
         
         tabBar.tintColor = .systemBlue
         tabBar.unselectedItemTintColor = .gray
-        tabBar.backgroundColor = .systemBackground
-        
+    }
+    
+    private func setupTabBarAppearance() {
         if #available(iOS 13.0, *) {
             let appearance = UITabBarAppearance()
-            appearance.shadowColor = .black
-             tabBar.scrollEdgeAppearance = appearance
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .systemBackground
+            appearance.shadowColor = .ypGray
+            tabBar.standardAppearance = appearance
+            
+            if #available(iOS 15.0, *) {
+                tabBar.scrollEdgeAppearance = appearance
+            }
         }
     }
-        
+    
     private func createNavController(for rootViewController: UIViewController,
-                                    title: String,
-                                    image: UIImage) -> UIViewController {
+                                     title: String,
+                                     image: UIImage) -> UIViewController {
         let navController = UINavigationController(rootViewController: rootViewController)
         navController.tabBarItem.title = title
         navController.tabBarItem.image = image
-        navController.navigationBar.prefersLargeTitles = true
         return navController
     }
 }
