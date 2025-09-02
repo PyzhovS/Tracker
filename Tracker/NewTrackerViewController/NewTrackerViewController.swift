@@ -156,9 +156,9 @@ final class NewTrackerViewController: UIViewController {
         view.backgroundColor = .white
         
         view.addSubview(scrollView)
-        scrollView.addSubview(contentView)
         
         contentView.addSubview(titleLabel)
+        scrollView.addSubview(contentView)
         contentView.addSubview(nameTextField)
         contentView.addSubview(tableView)
         contentView.addSubview(emojiLabel)
@@ -191,7 +191,7 @@ final class NewTrackerViewController: UIViewController {
         tableViewHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 150)
         
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: buttonsStack.topAnchor, constant: -16),
@@ -202,7 +202,7 @@ final class NewTrackerViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
+            titleLabel.bottomAnchor.constraint(equalTo: contentView.topAnchor, constant: -14),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
