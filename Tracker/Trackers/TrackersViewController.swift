@@ -3,6 +3,12 @@ import UIKit
 
 final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
+    
+    
+    private let trackerStore = TrackerStore()
+    private let trackerCategoryStore = TrackerCategoryStore()
+    private let trackerRecordStore = TrackerRecordStore()
+    
     private var visibleCategories: [TrackerCategory] = []
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
@@ -14,6 +20,27 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         setupUI()
         UpdateUI()
         filterTrackersBySelectedDate()
+        trackerStore.delegate = self
+        loadData()
+        
+    }
+    
+    private func loadData() {
+        do {
+            categories = try trackerCategoryStore.fetchCategories()
+            completedTrackers = try trackerRecordStore.fetchRecords()
+            
+            print("Загружено категорий: \(categories.count)")
+            print("Загружено записей: \(completedTrackers.count)")
+            
+            for category in categories {
+                print("Категория: \(category.title), трекеров: \(category.trackers.count)")
+            }
+            
+            filterTrackersBySelectedDate()
+        } catch {
+            print("Ошибка загрузки данных: \(error)")
+        }
     }
     
     private func UpdateUI() {
@@ -120,13 +147,29 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     private func addTrackerRecord(trackerId: UUID) {
         let record = TrackerRecord(trackerId: trackerId, date: currentDate)
-        completedTrackers.append(record)
-        collectionView.reloadData()
+        do {
+            try trackerRecordStore.addRecord(record)
+            completedTrackers.append(record)
+            collectionView.reloadData()
+        } catch {
+            print("Error adding record: \(error)")
+        }
     }
     
     private func removeTrackerRecord(trackerId: UUID) {
-        completedTrackers.removeAll { $0.trackerId == trackerId && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
-        collectionView.reloadData()
+        let recordToRemove = completedTrackers.first {
+            $0.trackerId == trackerId && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
+        }
+        
+        if let record = recordToRemove {
+            do {
+                try trackerRecordStore.removeRecord(record)
+                completedTrackers.removeAll { $0.trackerId == trackerId && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
+                collectionView.reloadData()
+            } catch {
+                print("Error removing record: \(error)")
+            }
+        }
     }
     
     private func isTrackerCompletedToday(trackerId: UUID) -> Bool {
@@ -289,17 +332,17 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
 
 extension TrackersViewController {
     func didCreateTracker(_ tracker: Tracker, in categoryTitle: String) {
-        if let index = categories.firstIndex(where: { $0.title == categoryTitle }) {
-            let existingCategory = categories[index]
-            let updatedCategory = TrackerCategory(
-                title: existingCategory.title,
-                trackers: existingCategory.trackers + [tracker]
-            )
-            categories[index] = updatedCategory
-        } else {
-            let newCategory = TrackerCategory(title: categoryTitle, trackers: [tracker])
-            categories.append(newCategory)
+        do {
+            try trackerStore.addTracker(tracker, to: categoryTitle)
+            loadData()
+        } catch {
+            print("Error saving tracker: \(error)")
         }
-        filterTrackersBySelectedDate()
+    }
+    
+}
+extension TrackersViewController: TrackerStoreDelegate {
+    func didUpdateTrackers() {
+        loadData()
     }
 }
