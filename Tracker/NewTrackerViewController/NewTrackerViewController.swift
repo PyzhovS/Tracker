@@ -11,9 +11,9 @@ final class NewTrackerViewController: UIViewController {
     private var selectedColor: UIColor? = nil
     private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     private let colors: [UIColor] = [
-        .blue, .red, .green, .gray, .orange, .blue,
-        .red, .green, .gray, .orange,.blue, .red,
-        .green, .gray, .orange, .blue, .red, .green
+        .colorSelection1, .colorSelection2, .colorSelection3, .colorSelection4, .colorSelection51, .colorSelection6,
+        .colorSelection7, .colorSelection8, .colorSelection9, .colorSelection10,.colorSelection11, .colorSelection12,
+        .colorSelection13, .colorSelection14, .colorSelection15, .colorSelection16, .colorSelection17, .colorSelection18
     ]
     
     // MARK: - UI Elements
@@ -215,26 +215,26 @@ final class NewTrackerViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             tableViewHeightConstraint,
             
-            emojiLabel.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 24),
-            emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            emojiLabel.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 32),
+            emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             emojiLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 16),
+            emojiCollectionView.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 24),
             emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 200),
             
-            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 24),
-            colorLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            colorLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 16),
+            colorLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             colorLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 16),
+            colorCollectionView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 24),
             colorCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             colorCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             colorCollectionView.heightAnchor.constraint(equalToConstant: 200),
             colorCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             
-            buttonsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            buttonsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             buttonsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             buttonsStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             buttonsStack.heightAnchor.constraint(equalToConstant: 60)
