@@ -92,8 +92,6 @@ final class TrackerStore: NSObject {
         trackerCoreData.id = tracker.id
         trackerCoreData.title = tracker.title
         trackerCoreData.emoji = tracker.emoji
-        
-        // Конвертируем UIColor в hex-строку
         trackerCoreData.color = tracker.color.toHex()
         
         if let schedule = tracker.schedule {
