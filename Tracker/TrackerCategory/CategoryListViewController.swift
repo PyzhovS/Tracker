@@ -110,7 +110,7 @@ final class CategoryListViewController: UIViewController {
             placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
             placeholderImageView.heightAnchor.constraint(equalToConstant: 80),
             
-
+            
             addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),

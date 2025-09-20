@@ -1,4 +1,4 @@
-// AddCategoryViewController.swift
+
 import UIKit
 
 final class AddCategoryViewController: UIViewController {
@@ -63,7 +63,6 @@ final class AddCategoryViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        // Показываем navigation bar только при полном закрытии
         if isMovingFromParent || isBeingDismissed {
             navigationController?.setNavigationBarHidden(false, animated: false)
         }

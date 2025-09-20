@@ -71,7 +71,7 @@ final class CategoryTableViewCell: UITableViewCell {
         checkmarkImageView.isHidden = !isSelected
         separatorView.isHidden = isLastCell
     }
-        override func prepareForReuse() {
+    override func prepareForReuse() {
         super.prepareForReuse()
         titleLabel.text = nil
         checkmarkImageView.isHidden = true

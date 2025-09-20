@@ -29,17 +29,15 @@ final class OnboardingViewController: UIViewController {
     
     // MARK: - Private Methods
     private func setupUI() {
-        // Background Image
+        
         backgroundImageView.contentMode = .scaleAspectFill
         backgroundImageView.clipsToBounds = true
         
-        // Title Label
         titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 0
         titleLabel.textColor = .black
         
-        // Action Button
         actionButton.setTitle("Вот это технологии!", for: .normal)
         actionButton.setTitleColor(.white, for: .normal)
         actionButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -58,12 +56,12 @@ final class OnboardingViewController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Background Image
+            
             backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        
+            
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             titleLabel.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -160),

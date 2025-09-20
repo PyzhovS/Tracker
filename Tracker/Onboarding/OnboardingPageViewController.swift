@@ -62,7 +62,7 @@ final class OnboardingPageViewController: UIPageViewController {
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
-
+    
     @objc private func pageControlTapped(_ sender: UIPageControl) {
         let direction: UIPageViewController.NavigationDirection
         if sender.currentPage > currentIndex {
@@ -77,10 +77,10 @@ final class OnboardingPageViewController: UIPageViewController {
         }
         
         let selectedViewController = pages[sender.currentPage]
-
+        
         setViewControllers([selectedViewController],
-                         direction: direction,
-                         animated: true) { [weak self] _ in
+                           direction: direction,
+                           animated: true) { [weak self] _ in
             self?.currentIndex = sender.currentPage
         }
     }

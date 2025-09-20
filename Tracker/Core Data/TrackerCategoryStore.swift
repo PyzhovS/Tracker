@@ -7,7 +7,7 @@ final class TrackerCategoryStore {
         self.context = context
     }
     
-    // Получение всех категорий из Core Data (только названия)
+    
     func fetchAllCategories() throws -> [String] {
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         let categoriesCoreData = try context.fetch(request)
@@ -16,7 +16,7 @@ final class TrackerCategoryStore {
     }
     
     func addNewCategory(title: String) throws {
-        // Проверяем, что категория с таким названием не существует
+        
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", title)
         let existingCategories = try context.fetch(request)
@@ -36,7 +36,6 @@ final class TrackerCategoryStore {
         }
     }
     
-    // Получение или создание категории (для привязки трекеров)
     func fetchOrCreateCategory(with title: String) throws -> TrackerCategoryCoreData {
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", title)
@@ -57,7 +56,6 @@ final class TrackerCategoryStore {
         }
     }
     
-    // Метод для совместимости со старым кодом
     func fetchCategories() throws -> [TrackerCategory] {
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         let categoriesCoreData = try context.fetch(request)
