@@ -27,6 +27,10 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     private func loadData() {
         do {
+            // Используем новый метод для экрана категорий
+            let categoryTitles = try trackerCategoryStore.fetchAllCategories()
+            
+            // Если нужно сохранить старую структуру для трекеров
             categories = try trackerCategoryStore.fetchCategories()
             completedTrackers = try trackerRecordStore.fetchRecords()
             

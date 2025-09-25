@@ -28,7 +28,7 @@ class AppTabBarController: UITabBarController {
             let appearance = UITabBarAppearance()
             appearance.configureWithOpaqueBackground()
             appearance.backgroundColor = .systemBackground
-            appearance.shadowColor = .ypGray
+            appearance.shadowColor = .gray
             tabBar.standardAppearance = appearance
             
             if #available(iOS 15.0, *) {
@@ -47,6 +47,7 @@ class AppTabBarController: UITabBarController {
     }
 }
 
+// MARK: - ThirdViewController
 class ThirdViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()

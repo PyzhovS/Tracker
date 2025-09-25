@@ -7,6 +7,35 @@ final class TrackerCategoryStore {
         self.context = context
     }
     
+    
+    func fetchAllCategories() throws -> [String] {
+        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let categoriesCoreData = try context.fetch(request)
+        
+        return categoriesCoreData.compactMap { $0.title }
+    }
+    
+    func addNewCategory(title: String) throws {
+        
+        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", title)
+        let existingCategories = try context.fetch(request)
+        
+        guard existingCategories.isEmpty else {
+            throw CategoryError.categoryAlreadyExists
+        }
+        
+        let newCategory = TrackerCategoryCoreData(context: context)
+        newCategory.title = title
+        
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            throw CategoryError.failedToSave
+        }
+    }
+    
     func fetchOrCreateCategory(with title: String) throws -> TrackerCategoryCoreData {
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", title)
@@ -17,9 +46,14 @@ final class TrackerCategoryStore {
         
         let newCategory = TrackerCategoryCoreData(context: context)
         newCategory.title = title
-        CoreDataManager.shared.saveContext()
         
-        return newCategory
+        do {
+            try context.save()
+            return newCategory
+        } catch {
+            context.rollback()
+            throw CategoryError.failedToSave
+        }
     }
     
     func fetchCategories() throws -> [TrackerCategory] {
@@ -27,17 +61,31 @@ final class TrackerCategoryStore {
         let categoriesCoreData = try context.fetch(request)
         
         return categoriesCoreData.compactMap { categoryCoreData in
-            guard let title = categoryCoreData.title,
-                  let trackersSet = categoryCoreData.trackers as? Set<TrackerCoreData> else {
-                return nil
-            }
+            guard let title = categoryCoreData.title else { return nil }
             
-            let trackers = trackersSet.compactMap { trackerCoreData -> Tracker? in
-                let trackerStore = TrackerStore()
+            let trackerStore = TrackerStore()
+            let trackers: [Tracker] = (categoryCoreData.trackers as? Set<TrackerCoreData>)?.compactMap { trackerCoreData in
                 return trackerStore.convertToTracker(from: trackerCoreData)
-            }
+            } ?? []
             
             return TrackerCategory(title: title, trackers: trackers)
+        }
+    }
+}
+
+enum CategoryError: Error, LocalizedError {
+    case categoryAlreadyExists
+    case failedToSave
+    case failedToFetch
+    
+    var errorDescription: String? {
+        switch self {
+        case .categoryAlreadyExists:
+            return "Категория с таким названием уже существует"
+        case .failedToSave:
+            return "Не удалось сохранить категорию"
+        case .failedToFetch:
+            return "Не удалось загрузить категории"
         }
     }
 }
