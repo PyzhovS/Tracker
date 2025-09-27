@@ -1,4 +1,3 @@
-
 import UIKit
 
 final class AddCategoryViewController: UIViewController {
@@ -9,7 +8,7 @@ final class AddCategoryViewController: UIViewController {
     // MARK: - UI Elements
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая категория"
+        label.text = Localizable.AddCategory.title
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         return label
@@ -17,7 +16,7 @@ final class AddCategoryViewController: UIViewController {
     
     private lazy var textField: UITextField = {
         let field = UITextField()
-        field.placeholder = "Введите название категории"
+        field.placeholder = Localizable.AddCategory.placeholder
         field.backgroundColor = .backgroundDay
         field.layer.cornerRadius = 16
         field.layer.masksToBounds = true
@@ -32,7 +31,7 @@ final class AddCategoryViewController: UIViewController {
     
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(Localizable.Common.done, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
@@ -143,3 +142,4 @@ extension AddCategoryViewController: UITextFieldDelegate {
         return updatedText.count <= 38
     }
 }
+

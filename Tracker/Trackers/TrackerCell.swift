@@ -102,11 +102,11 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with title: String, emoji: String, color: UIColor, completedDays: Int, isCompleted: Bool,isActive: Bool) {
+    func configure(with title: String, emoji: String, color: UIColor, completedDays: Int, isCompleted: Bool, isActive: Bool) {
         titleLabel.text = title
         emojiLabel.text = emoji
         coloredView.backgroundColor = color
-        daysLabel.text = "\(completedDays) дней"
+        daysLabel.text = Localizable.Dates.daysCount(completedDays)
         plusButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
         plusButton.backgroundColor = coloredView.backgroundColor
         plusButton.isEnabled = isActive
@@ -117,3 +117,4 @@ final class TrackerCell: UICollectionViewCell {
         completionHandler?()
     }
 }
+

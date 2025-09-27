@@ -81,11 +81,12 @@ enum CategoryError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .categoryAlreadyExists:
-            return "Категория с таким названием уже существует"
+            return Localizable.Errors.categoryAlreadyExists
         case .failedToSave:
-            return "Не удалось сохранить категорию"
+            return Localizable.Errors.failedToSave
         case .failedToFetch:
-            return "Не удалось загрузить категории"
+            return Localizable.Errors.failedToFetch
         }
     }
 }
+

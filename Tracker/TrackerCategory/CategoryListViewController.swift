@@ -39,7 +39,7 @@ final class CategoryListViewController: UIViewController {
     
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно\nобъединить по смыслу"
+        label.text = Localizable.Category.placeholderText
         label.font = UIFont.systemFont(ofSize: 12)
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -49,7 +49,7 @@ final class CategoryListViewController: UIViewController {
     
     private lazy var addButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(Localizable.Category.addButton, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .black
         button.setTitleColor(.white, for: .normal)
@@ -81,7 +81,7 @@ final class CategoryListViewController: UIViewController {
     // MARK: - Private Methods
     private func setupUI() {
         view.backgroundColor = .white
-        title = "Категория"
+        title = Localizable.Category.title
         
         placeholderStackView.addArrangedSubview(placeholderImageView)
         placeholderStackView.addArrangedSubview(placeholderLabel)
@@ -148,8 +148,8 @@ final class CategoryListViewController: UIViewController {
     }
     
     private func showError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        let alert = UIAlertController(title: Localizable.Alerts.errorTitle, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Localizable.Common.ok, style: .default))
         present(alert, animated: true)
     }
     
@@ -197,3 +197,4 @@ extension CategoryListViewController: UITableViewDataSource, UITableViewDelegate
         return 75
     }
 }
+

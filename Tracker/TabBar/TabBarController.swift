@@ -11,10 +11,10 @@ class AppTabBarController: UITabBarController {
     func setupViewControllers() {
         let trackerController = TrackersViewController()
         let firstVC = createNavController(for: trackerController,
-                                          title: "Трекеры",
+                                          title: Localizable.Tabbar.trackers,
                                           image: UIImage(resource: .tab1))
         let thirdVC = createNavController(for: ThirdViewController(),
-                                          title: "Статистика",
+                                          title: Localizable.Tabbar.statistics,
                                           image: UIImage(resource: .tab2))
         
         viewControllers = [firstVC, thirdVC]

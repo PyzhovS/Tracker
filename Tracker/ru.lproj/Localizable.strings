@@ -1,0 +1,63 @@
+/* Common */
+"common.done" = "Готово";
+"common.cancel" = "Отменить";
+"common.ok" = "OK";
+"common.errorGeneric" = "Произошла ошибка";
+
+/* Alerts */
+"alerts.errorTitle" = "Ошибка";
+
+/* Errors */
+"errors.categoryAlreadyExists" = "Категория с таким названием уже существует";
+"errors.failedToSave" = "Не удалось сохранить категорию";
+"errors.failedToFetch" = "Не удалось загрузить категории";
+
+/* Weekday full names */
+"weekday.monday" = "Понедельник";
+"weekday.tuesday" = "Вторник";
+"weekday.wednesday" = "Среда";
+"weekday.thursday" = "Четверг";
+"weekday.friday" = "Пятница";
+"weekday.saturday" = "Суббота";
+"weekday.sunday" = "Воскресенье";
+
+/* Weekday short names */
+"weekdayShort.monday" = "Пн";
+"weekdayShort.tuesday" = "Вт";
+"weekdayShort.wednesday" = "Ср";
+"weekdayShort.thursday" = "Чт";
+"weekdayShort.friday" = "Пт";
+"weekdayShort.saturday" = "Сб";
+"weekdayShort.sunday" = "Вс";
+
+/* Add Category */
+"addCategory.title" = "Новая категория";
+"addCategory.placeholder" = "Введите название категории";
+
+/* Schedule */
+"schedule.title" = "Расписание";
+
+/* Category screen */
+"category.title" = "Категория";
+"category.placeholderText" = "Привычки и события можно\nобъединить по смыслу";
+"category.addButton" = "Добавить категорию";
+
+/* New Tracker */
+"newTracker.title" = "Новая привычка";
+"newTracker.namePlaceholder" = "Введите название трекера";
+"newTracker.emojiTitle" = "Emoji";
+"newTracker.colorTitle" = "Цвет";
+"newTracker.create" = "Создать";
+"newTracker.category" = "Категория";
+"newTracker.schedule" = "Расписание";
+"newTracker.everyDay" = "Каждый день";
+
+"onboarding.actionButton" = "Вот это технологии!";
+"trackers.title" = "Трекеры";
+"trackers.searchPlaceholder" = "Поиск";
+"trackers.emptyTitle" = "Что будем отслеживать?";
+"onboarding.page1.title" = "Отслеживайте только то, что хотите";
+"onboarding.page2.title" = "Даже если это не литры воды и йога";
+
+"trackers.tabbar" = "Трекеры";
+"statistics.tabbar" = "Статистика";

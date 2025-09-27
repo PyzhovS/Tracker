@@ -1,0 +1,67 @@
+/* Common */
+"common.done" = "Done";
+"common.cancel" = "Cancel";
+"common.ok" = "OK";
+"common.errorGeneric" = "An error occurred";
+
+/* Alerts */
+"alerts.errorTitle" = "Error";
+
+/* Errors */
+"errors.categoryAlreadyExists" = "A category with this name already exists";
+"errors.failedToSave" = "Failed to save category";
+"errors.failedToFetch" = "Failed to load categories";
+
+/* Weekday full names */
+"weekday.monday" = "Monday";
+"weekday.tuesday" = "Tuesday";
+"weekday.wednesday" = "Wednesday";
+"weekday.thursday" = "Thursday";
+"weekday.friday" = "Friday";
+"weekday.saturday" = "Saturday";
+"weekday.sunday" = "Sunday";
+
+/* Weekday short names */
+"weekdayShort.monday" = "Mon";
+"weekdayShort.tuesday" = "Tue";
+"weekdayShort.wednesday" = "Wed";
+"weekdayShort.thursday" = "Thu";
+"weekdayShort.friday" = "Fri";
+"weekdayShort.saturday" = "Sat";
+"weekdayShort.sunday" = "Sun";
+
+/* Add Category */
+"addCategory.title" = "New category";
+"addCategory.placeholder" = "Enter category name";
+
+/* Schedule */
+"schedule.title" = "Schedule";
+
+/* Category screen */
+"category.title" = "Category";
+"category.placeholderText" = "Habits and events can be\ngrouped by meaning";
+"category.addButton" = "Add category";
+
+/* New Tracker */
+"newTracker.title" = "New habit";
+"newTracker.namePlaceholder" = "Enter tracker name";
+"newTracker.emojiTitle" = "Emoji";
+"newTracker.colorTitle" = "Color";
+"newTracker.create" = "Create";
+"newTracker.category" = "Category";
+"newTracker.schedule" = "Schedule";
+"newTracker.everyDay" = "Every day";
+
+"onboarding.actionButton" = "That's technology!";
+"trackers.title" = "Trackers";
+"trackers.searchPlaceholder" = "Search";
+"trackers.emptyTitle" = "What shall we track?";
+
+/* Onboarding*/
+"onboarding.page1.title" = "Track only what you want";
+"onboarding.page2.title" = "Even if it's not liters of water and yoga";
+
+/* Tab Bar */
+"trackers.tabbar" = "Trackers";
+"statistics.tabbar" = "Statistics";
+

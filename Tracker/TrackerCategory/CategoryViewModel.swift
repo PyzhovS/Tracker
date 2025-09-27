@@ -71,9 +71,10 @@ final class CategoryViewModel {
     // MARK: - Private Methods
     private func handleError(_ error: Error) {
         if let categoryError = error as? CategoryError {
-            onError?(categoryError.errorDescription ?? "Произошла ошибка")
+            onError?(categoryError.errorDescription ?? Localizable.Common.errorGeneric)
         } else {
             onError?(error.localizedDescription)
         }
     }
 }
+

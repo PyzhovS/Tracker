@@ -11,7 +11,7 @@ struct Tracker {
 
 enum WeekDay: Int, CaseIterable, Codable {
     case monday = 2
-    case tuesday = 3   
+    case tuesday = 3
     case wednesday = 4
     case thursday = 5
     case friday = 6
@@ -23,13 +23,14 @@ enum WeekDay: Int, CaseIterable, Codable {
     
     var displayName: String {
         switch self {
-        case .monday: return "Понедельник"
-        case .tuesday: return "Вторник"
-        case .wednesday: return "Среда"
-        case .thursday: return "Четверг"
-        case .friday: return "Пятница"
-        case .saturday: return "Суббота"
-        case .sunday: return "Воскресенье"
+        case .monday: return Localizable.Weekday.monday
+        case .tuesday: return Localizable.Weekday.tuesday
+        case .wednesday: return Localizable.Weekday.wednesday
+        case .thursday: return Localizable.Weekday.thursday
+        case .friday: return Localizable.Weekday.friday
+        case .saturday: return Localizable.Weekday.saturday
+        case .sunday: return Localizable.Weekday.sunday
         }
     }
 }
+

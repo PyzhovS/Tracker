@@ -8,7 +8,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         // Оставил для проверки онбординга
-        // UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
+         UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
         
         window = UIWindow(windowScene: windowScene)
         

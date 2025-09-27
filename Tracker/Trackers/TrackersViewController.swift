@@ -3,8 +3,6 @@ import UIKit
 
 final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
-    
-    
     private let trackerStore = TrackerStore()
     private let trackerCategoryStore = TrackerCategoryStore()
     private let trackerRecordStore = TrackerRecordStore()
@@ -74,7 +72,7 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     private lazy var labelTitle: UILabel = {
         let label = UILabel()
-        label.text = "Трекеры"
+        label.text = Localizable.Trackers.title
         label.textColor = .black
         label.font = UIFont.boldSystemFont(ofSize: 34)
         return label
@@ -82,7 +80,7 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     private lazy var searchBar: UISearchBar = {
         let search = UISearchBar()
-        search.placeholder = "Поиск"
+        search.placeholder = Localizable.Trackers.searchPlaceholder
         search.backgroundImage = UIImage()
         search.layer.cornerRadius = 10
         search.layer.masksToBounds = true
@@ -115,7 +113,7 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     private lazy var labelSearch: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = Localizable.Trackers.emptyTitle
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 12)
         return label
@@ -350,3 +348,4 @@ extension TrackersViewController: TrackerStoreDelegate {
         loadData()
     }
 }
+

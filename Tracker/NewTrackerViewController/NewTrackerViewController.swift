@@ -3,7 +3,7 @@ import UIKit
 final class NewTrackerViewController: UIViewController {
     
     // MARK: - Properties
-    private let menuItems = ["Категория", "Расписание"]
+    private let menuItems = [Localizable.NewTracker.category, Localizable.NewTracker.schedule]
     var onTrackerCreated: ((Tracker, String) -> Void)?
     private var currentSchedule: [WeekDay] = []
     private var selectedCategory: String?
@@ -19,7 +19,7 @@ final class NewTrackerViewController: UIViewController {
     // MARK: - UI Elements
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая привычка"
+        label.text = Localizable.NewTracker.title
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         return label
@@ -27,7 +27,7 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var nameTextField: UITextField = {
         let field = UITextField()
-        field.placeholder = "Введите название трекера"
+        field.placeholder = Localizable.NewTracker.namePlaceholder
         field.backgroundColor = .backgroundDay
         field.layer.cornerRadius = 16
         field.layer.masksToBounds = true
@@ -55,7 +55,7 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
-        label.text = "Emoji"
+        label.text = Localizable.NewTracker.emojiTitle
         label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
         label.textAlignment = .left
         return label
@@ -77,7 +77,7 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var colorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Цвет"
+        label.text = Localizable.NewTracker.colorTitle
         label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
         label.textAlignment = .left
         return label
@@ -99,7 +99,7 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(Localizable.Common.cancel, for: .normal)
         button.setTitleColor(.ypRed, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .clear
@@ -112,7 +112,7 @@ final class NewTrackerViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(Localizable.NewTracker.create, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
@@ -287,7 +287,7 @@ final class NewTrackerViewController: UIViewController {
             self?.selectedCategory = selectedCategory
             
             if let cell = self?.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? CustomTableViewCell {
-                cell.configure(title: "Категория", subtitle: selectedCategory)
+                cell.configure(title: Localizable.NewTracker.category, subtitle: selectedCategory)
             }
             self?.textFieldDidChange()
             
@@ -328,7 +328,7 @@ final class NewTrackerViewController: UIViewController {
     
     private func formatSelectedDays(_ days: [WeekDay]) -> String {
         if days.count == WeekDay.allCases.count {
-            return "Каждый день"
+            return Localizable.NewTracker.everyDay
         }
         let sortedDays = days.sorted { $0.rawValue < $1.rawValue }
         return sortedDays.map { $0.shortName }.joined(separator: ", ")
@@ -432,13 +432,14 @@ extension NewTrackerViewController: UICollectionViewDataSource, UICollectionView
 extension WeekDay {
     var shortName: String {
         switch self {
-        case .monday: return "Пн"
-        case .tuesday: return "Вт"
-        case .wednesday: return "Ср"
-        case .thursday: return "Чт"
-        case .friday: return "Пт"
-        case .saturday: return "Сб"
-        case .sunday: return "Вс"
+        case .monday: return Localizable.WeekdayShort.monday
+        case .tuesday: return Localizable.WeekdayShort.tuesday
+        case .wednesday: return Localizable.WeekdayShort.wednesday
+        case .thursday: return Localizable.WeekdayShort.thursday
+        case .friday: return Localizable.WeekdayShort.friday
+        case .saturday: return Localizable.WeekdayShort.saturday
+        case .sunday: return Localizable.WeekdayShort.sunday
         }
     }
 }
+
