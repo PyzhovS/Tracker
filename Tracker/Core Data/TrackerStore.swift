@@ -171,3 +171,59 @@ extension UIColor {
                       lroundf(a * 255))
     }
 }
+
+extension TrackerStore {
+    func deleteTracker(_ tracker: Tracker) throws {
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        
+        if let trackerToDelete = try context.fetch(request).first {
+            context.delete(trackerToDelete)
+            try context.save()
+        }
+    }
+    
+    // Старый метод оставлен для совместимости (обновляет без смены категории)
+    func updateTracker(_ tracker: Tracker) throws {
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        
+        if let trackerToUpdate = try context.fetch(request).first {
+            trackerToUpdate.title = tracker.title
+            trackerToUpdate.emoji = tracker.emoji
+            trackerToUpdate.color = tracker.color.toHex()
+            
+            if let schedule = tracker.schedule {
+                trackerToUpdate.schedule = try? JSONEncoder().encode(schedule)
+            }
+            
+            try context.save()
+        }
+    }
+    
+    // Новый метод — обновление с изменением категории
+    func updateTracker(_ tracker: Tracker, in categoryTitle: String) throws {
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
+        
+        if let trackerToUpdate = try context.fetch(request).first {
+            trackerToUpdate.title = tracker.title
+            trackerToUpdate.emoji = tracker.emoji
+            trackerToUpdate.color = tracker.color.toHex()
+            
+            if let schedule = tracker.schedule {
+                trackerToUpdate.schedule = try? JSONEncoder().encode(schedule)
+            } else {
+                trackerToUpdate.schedule = nil
+            }
+            
+            // смена категории
+            let categoryStore = TrackerCategoryStore()
+            let category = try categoryStore.fetchOrCreateCategory(with: categoryTitle)
+            trackerToUpdate.category = category
+            
+            try context.save()
+        }
+    }
+}
+

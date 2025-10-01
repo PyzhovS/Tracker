@@ -3,14 +3,19 @@
 "common.cancel" = "Cancel";
 "common.ok" = "OK";
 "common.errorGeneric" = "An error occurred";
+"common.delete" = "Delete";
 
 /* Alerts */
 "alerts.errorTitle" = "Error";
+"alerts.deleteTitle" = "Delete tracker?";
+"alerts.deleteMessage" = "This action cannot be undone";
 
 /* Errors */
 "errors.categoryAlreadyExists" = "A category with this name already exists";
 "errors.failedToSave" = "Failed to save category";
 "errors.failedToFetch" = "Failed to load categories";
+"errors.failedToDelete" = "Failed to delete tracker";
+"errors.failedToUpdate" = "Failed to update tracker";
 
 /* Weekday full names */
 "weekday.monday" = "Monday";
@@ -65,3 +70,17 @@
 "trackers.tabbar" = "Trackers";
 "statistics.tabbar" = "Statistics";
 
+/* Filters */
+"filters.title" = "Filters";
+"filters.button" = "Filters";
+"filters.all" = "All trackers";
+"filters.today" = "Trackers for today";
+"filters.completed" = "Completed";
+"filters.incompleted" = "Incomplete";
+
+/* Empty states */
+"empty.nothingFound" = "Nothing found";
+
+/* Context Menu */
+"contextMenu.edit" = "Edit";
+"contextMenu.delete" = "Delete";

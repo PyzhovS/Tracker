@@ -157,4 +157,3 @@ extension ScheduleSelectionViewController: UITableViewDataSource, UITableViewDel
         }
     }
 }
-

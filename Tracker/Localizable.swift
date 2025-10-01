@@ -16,16 +16,22 @@ enum Localizable {
         static var cancel: String { tr("common.cancel", comment: "Action: Cancel") }
         static var ok: String { tr("common.ok", comment: "Action: OK") }
         static var errorGeneric: String { tr("common.errorGeneric", comment: "Generic error message") }
+        static var delete: String { tr("common.delete", comment: "Action: Delete") }
     }
     
     enum Alerts {
         static var errorTitle: String { tr("alerts.errorTitle", comment: "Title for error alert") }
+        static var deleteTitle: String { tr("alerts.deleteTitle") }
+        static var deleteMessage: String { tr("alerts.deleteMessage") }
     }
     
     enum Errors {
-        static var categoryAlreadyExists: String { tr("errors.categoryAlreadyExists", comment: "Error: category already exists") }
-        static var failedToSave: String { tr("errors.failedToSave", comment: "Error: failed to save") }
-        static var failedToFetch: String { tr("errors.failedToFetch", comment: "Error: failed to fetch") }
+        static var categoryAlreadyExists: String { tr("errors.categoryAlreadyExists") }
+        static var failedToSave: String { tr("errors.failedToSave") }
+        static var failedToFetch: String { tr("errors.failedToFetch") }
+        static var failedToDelete: String { tr("errors.failedToDelete") }
+        static var failedToUpdate: String { tr("errors.failedToUpdate") }
+        
     }
     
     enum Weekday {
@@ -97,5 +103,9 @@ enum Localizable {
             trf("dates.days_count", count, comment: "Pluralized number of days")
         }
     }
+    enum ContextMenu {
+        static var edit: String { tr("contextMenu.edit") }
+        static var delete: String { tr("contextMenu.delete") }
+    }
+    
 }
-

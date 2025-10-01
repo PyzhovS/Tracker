@@ -56,8 +56,37 @@
 "trackers.title" = "Трекеры";
 "trackers.searchPlaceholder" = "Поиск";
 "trackers.emptyTitle" = "Что будем отслеживать?";
+
+/* Onboarding*/
 "onboarding.page1.title" = "Отслеживайте только то, что хотите";
 "onboarding.page2.title" = "Даже если это не литры воды и йога";
 
+/* Tab Bar */
 "trackers.tabbar" = "Трекеры";
 "statistics.tabbar" = "Статистика";
+
+/* Filters */
+"filters.title" = "Фильтры";
+"filters.button" = "Фильтры";
+"filters.all" = "Все трекеры";
+"filters.today" = "Трекеры на сегодня";
+"filters.completed" = "Завершённые";
+"filters.incompleted" = "Незавершённые";
+
+/* Empty states */
+"empty.nothingFound" = "Ничего не найдено";
+
+/* Context Menu */
+"contextMenu.edit" = "Редактировать";
+"contextMenu.delete" = "Удалить";
+
+/* Alerts */
+"alerts.deleteTitle" = "Удалить трекер?";
+"alerts.deleteMessage" = "Это действие нельзя отменить";
+
+/* Common */
+"common.delete" = "Удалить";
+
+/* Errors */
+"errors.failedToDelete" = "Не удалось удалить трекер";
+"errors.failedToUpdate" = "Не удалось обновить трекер";

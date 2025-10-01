@@ -2,7 +2,14 @@ import UIKit
 
 final class NewTrackerViewController: UIViewController {
     
-    // MARK: - Properties
+    enum Mode {
+        case create
+        case edit(Tracker, String) // добавили текущую категорию
+    }
+    
+    var mode: Mode = .create
+    var onTrackerUpdated: ((Tracker, String) -> Void)? // передаем и категорию наружу
+    
     private let menuItems = [Localizable.NewTracker.category, Localizable.NewTracker.schedule]
     var onTrackerCreated: ((Tracker, String) -> Void)?
     private var currentSchedule: [WeekDay] = []
@@ -11,12 +18,11 @@ final class NewTrackerViewController: UIViewController {
     private var selectedColor: UIColor? = nil
     private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     private let colors: [UIColor] = [
-        .colorSelection1, .colorSelection2, .colorSelection3, .colorSelection4, .colorSelection51, .colorSelection6,
-        .colorSelection7, .colorSelection8, .colorSelection9, .colorSelection10,.colorSelection11, .colorSelection12,
+        .colorSelection1, .colorSelection2, .colorSelection3, .colorSelection4, .colorSelection5, .colorSelection6,
+        .colorSelection7, .colorSelection8, .colorSelection9, .colorSelection10, .colorSelection11, .colorSelection12,
         .colorSelection13, .colorSelection14, .colorSelection15, .colorSelection16, .colorSelection17, .colorSelection18
     ]
     
-    // MARK: - UI Elements
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = Localizable.NewTracker.title
@@ -143,15 +149,31 @@ final class NewTrackerViewController: UIViewController {
     
     private var tableViewHeightConstraint: NSLayoutConstraint!
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
         setupGestureRecognizer()
+        
+        if case .edit(let tracker, let categoryTitle) = mode {
+            populateWithTrackerData(tracker, categoryTitle: categoryTitle)
+        }
     }
     
-    // MARK: - Private Methods
+    private func populateWithTrackerData(_ tracker: Tracker, categoryTitle: String) {
+        nameTextField.text = tracker.title
+        selectedEmoji = tracker.emoji
+        selectedColor = tracker.color
+        currentSchedule = tracker.schedule ?? []
+        selectedCategory = categoryTitle
+        
+        tableView.reloadData()
+        emojiCollectionView.reloadData()
+        colorCollectionView.reloadData()
+        viewHeightConstraint()
+        textFieldDidChange()
+    }
+    
     private func setupUI() {
         view.backgroundColor = .white
         
@@ -202,7 +224,7 @@ final class NewTrackerViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            titleLabel.bottomAnchor.constraint(equalTo: contentView.topAnchor, constant: -14),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -14),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
@@ -245,11 +267,16 @@ final class NewTrackerViewController: UIViewController {
         let maxText = 38
         let text = nameTextField.text ?? ""
         let isNameEntered = !text.isEmpty && text.count <= maxText
-        let currentScheduleIsEmpty = !currentSchedule.isEmpty
+        let hasSchedule = !currentSchedule.isEmpty
         let isEmojiSelected = selectedEmoji != nil
         let isColorSelected = selectedColor != nil
-        let isCategorySelected = selectedCategory != nil // Проверяем выбор категории
-        let isEnable = currentScheduleIsEmpty && isNameEntered && isEmojiSelected && isColorSelected && isCategorySelected
+        
+        let requiresCategory: Bool = {
+            if case .create = mode { return true } else { return false }
+        }()
+        let isCategoryOK = requiresCategory ? (selectedCategory != nil) : true
+        
+        let isEnable = hasSchedule && isNameEntered && isEmojiSelected && isColorSelected && isCategoryOK
         
         createButton.isEnabled = isEnable
         createButton.backgroundColor = isEnable ? .black : .ypGray
@@ -262,18 +289,33 @@ final class NewTrackerViewController: UIViewController {
     @objc private func createButtonTapped() {
         guard let name = nameTextField.text, !name.isEmpty,
               let emoji = selectedEmoji,
-              let category = selectedCategory, // Проверяем, что категория выбрана
               let color = selectedColor else { return }
         
+        let id: UUID
+        switch mode {
+        case .create:
+            id = UUID()
+        case .edit(let existing, _):
+            id = existing.id
+        }
+        
         let newTracker = Tracker(
-            id: UUID(),
+            id: id,
             title: name,
             emoji: emoji,
             color: color,
             schedule: currentSchedule
         )
         
-        onTrackerCreated?(newTracker, category) // Передаем категорию
+        switch mode {
+        case .create:
+            guard let category = selectedCategory else { return }
+            onTrackerCreated?(newTracker, category)
+        case .edit(_, let originalCategory):
+            let categoryToSave = selectedCategory ?? originalCategory
+            onTrackerUpdated?(newTracker, categoryToSave)
+        }
+        
         dismiss(animated: true)
     }
     
@@ -281,7 +323,7 @@ final class NewTrackerViewController: UIViewController {
         hideKeyboard()
         
         let viewModel = CategoryViewModel(selectedCategory: selectedCategory)
-        let categoryVC = CategoryListViewController(viewModel: viewModel)
+        let categoryVC = CategoryListViewController(selectedCategory: selectedCategory, viewModel: viewModel)
         
         viewModel.onCategorySelected = { [weak self] selectedCategory in
             self?.selectedCategory = selectedCategory
@@ -313,14 +355,7 @@ final class NewTrackerViewController: UIViewController {
     }
     
     private func viewHeightConstraint() {
-        let totalHeight: CGFloat = 165
-        for i in 0..<menuItems.count {
-            if i == 1 && !currentSchedule.isEmpty {
-                tableViewHeightConstraint.constant = totalHeight
-            } else {
-                tableViewHeightConstraint.constant = 150
-            }
-        }
+        tableViewHeightConstraint.constant = currentSchedule.isEmpty ? 150 : 165
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
@@ -335,7 +370,6 @@ final class NewTrackerViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDataSource, UITableViewDelegate
 extension NewTrackerViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -351,7 +385,7 @@ extension NewTrackerViewController: UITableViewDataSource, UITableViewDelegate {
         var subtitle: String? = nil
         
         if indexPath.row == 0 {
-            subtitle = selectedCategory // Показываем выбранную категорию
+            subtitle = selectedCategory
         } else if indexPath.row == 1 {
             subtitle = currentSchedule.isEmpty ? nil : formatSelectedDays(currentSchedule)
         }
@@ -384,8 +418,6 @@ extension NewTrackerViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-
-// MARK: - UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
 extension NewTrackerViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
