@@ -2,8 +2,19 @@ import UIKit
 
 final class AddCategoryViewController: UIViewController {
     
+    // MARK: - Modes
+    enum Mode {
+        case create
+        case edit(originalName: String)
+    }
+    
     // MARK: - Properties
+    var mode: Mode = .create
+    
+    // Колбэк для создания новой категории
     var onCategoryAdded: ((String) -> Void)?
+    // Колбэк для переименования: (старое имя, новое имя)
+    var onCategoryRenamed: ((String, String) -> Void)?
     
     // MARK: - UI Elements
     private lazy var titleLabel: UILabel = {
@@ -25,6 +36,7 @@ final class AddCategoryViewController: UIViewController {
         field.font = UIFont.systemFont(ofSize: 17)
         field.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         field.returnKeyType = .done
+        field.clearButtonMode = .whileEditing
         field.delegate = self
         return field
     }()
@@ -47,11 +59,11 @@ final class AddCategoryViewController: UIViewController {
         setupUI()
         setupConstraints()
         setupGestureRecognizer()
+        applyMode()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Скрываем navigation bar при появлении
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
@@ -103,25 +115,55 @@ final class AddCategoryViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
+    private func applyMode() {
+        switch mode {
+        case .create:
+            titleLabel.text = Localizable.AddCategory.title
+            textField.text = ""
+            textField.placeholder = Localizable.AddCategory.placeholder
+            doneButton.isEnabled = false
+            doneButton.backgroundColor = .ypGray
+            
+        case .edit(let originalName):
+            titleLabel.text = NSLocalizedString("editCategory.title", comment: "Edit category title")
+            textField.text = originalName
+            validate(text: originalName)
+        }
+    }
+    
+    private func validate(text: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch mode {
+        case .create:
+            let enabled = !trimmed.isEmpty
+            doneButton.isEnabled = enabled
+            doneButton.backgroundColor = enabled ? .black : .ypGray
+        case .edit(let originalName):
+            let enabled = !trimmed.isEmpty && trimmed != originalName
+            doneButton.isEnabled = enabled
+            doneButton.backgroundColor = enabled ? .black : .ypGray
+        }
+    }
+    
     @objc private func hideKeyboard() {
         view.endEditing(true)
     }
     
     @objc private func textFieldDidChange() {
-        let text = textField.text ?? ""
-        let isNameEntered = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        
-        doneButton.isEnabled = isNameEntered
-        doneButton.backgroundColor = isNameEntered ? .black : .ypGray
+        validate(text: textField.text ?? "")
     }
     
     @objc private func doneButtonTapped() {
-        guard let categoryName = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !categoryName.isEmpty else {
-            return
-        }
+        guard let text = textField.text else { return }
+        let name = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
         
-        onCategoryAdded?(categoryName)
+        switch mode {
+        case .create:
+            onCategoryAdded?(name)
+        case .edit(let originalName):
+            onCategoryRenamed?(originalName, name)
+        }
         dismiss(animated: true)
     }
 }
@@ -142,4 +184,3 @@ extension AddCategoryViewController: UITextFieldDelegate {
         return updatedText.count <= 38
     }
 }
-

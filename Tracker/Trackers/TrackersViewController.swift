@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-final class TrackersViewController: UIViewController, UISearchResultsUpdating {
+final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     private let trackerStore = TrackerStore()
     private let trackerCategoryStore = TrackerCategoryStore()
@@ -23,24 +23,13 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
     }
     
     private var isSearching: Bool {
-        let text = searchController.searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let text = searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return !text.isEmpty
     }
-    
-    private lazy var searchController: UISearchController = {
-        let sc = UISearchController(searchResultsController: nil)
-        sc.searchResultsUpdater = self
-        sc.obscuresBackgroundDuringPresentation = false
-        sc.searchBar.placeholder = Localizable.Trackers.searchPlaceholder
-        sc.searchBar.returnKeyType = .done
-        sc.searchBar.enablesReturnKeyAutomatically = false
-        return sc
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupSearchController()
         UpdateUI()
         currentFilter = filterStorage.current // если не выбирали — nil (все трекеры)
         filterTrackersBySelectedDate()
@@ -51,12 +40,6 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         updateCollectionInsets()
-    }
-    
-    private func setupSearchController() {
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
-        definesPresentationContext = true
     }
     
     private func loadData() {
@@ -121,6 +104,18 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
         return label
     }()
     
+    private lazy var searchBar: UISearchBar = {
+        let search = UISearchBar()
+        search.placeholder = Localizable.Trackers.searchPlaceholder
+        search.backgroundImage = UIImage()
+        search.layer.cornerRadius = 10
+        search.layer.masksToBounds = true
+        search.delegate = self
+        search.returnKeyType = .done
+        search.enablesReturnKeyAutomatically = false
+        return search
+    }()
+    
     private lazy var datePicker: UIDatePicker = {
         let picker = UIDatePicker()
         picker.preferredDatePickerStyle = .compact
@@ -166,6 +161,7 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
         view.addSubview(collectionView)
         view.addSubview(placeholder)
         view.addSubview(labelSearch)
+        view.addSubview(searchBar)
         view.addSubview(datePicker)
         view.addSubview(labelTitle)
         view.addSubview(addTracker)
@@ -173,6 +169,7 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
         
         [placeholder,
          labelTitle,
+         searchBar,
          addTracker,
          labelSearch,
          datePicker,
@@ -306,7 +303,7 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
     }
     
     private func applySearchFilter(to categories: [TrackerCategory]) -> [TrackerCategory] {
-        let query = searchController.searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let query = searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         guard !query.isEmpty else { return categories }
         let lowercasedQuery = query.lowercased()
         return categories.compactMap { category in
@@ -347,7 +344,11 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
             labelTitle.topAnchor.constraint(equalTo: addTracker.bottomAnchor, constant: 1),
             labelTitle.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             
-            collectionView.topAnchor.constraint(equalTo: labelTitle.bottomAnchor, constant: 24),
+            searchBar.topAnchor.constraint(equalTo: labelTitle.bottomAnchor, constant: 7),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 9),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -9),
+            
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -361,9 +362,13 @@ final class TrackersViewController: UIViewController, UISearchResultsUpdating {
         ])
     }
     
-    // MARK: - UISearchResultsUpdating
-    func updateSearchResults(for searchController: UISearchController) {
+    // MARK: - UISearchBarDelegate
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         filterTrackersBySelectedDate()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 }
 
@@ -602,4 +607,3 @@ extension TrackersViewController: UICollectionViewDelegate {
         present(alert, animated: true)
     }
 }
-

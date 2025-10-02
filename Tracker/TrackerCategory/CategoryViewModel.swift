@@ -39,6 +39,37 @@ final class CategoryViewModel {
         }
     }
     
+    func renameCategory(oldTitle: String, newTitle: String) {
+        do {
+            try categoryStore.renameCategory(from: oldTitle, to: newTitle)
+            if let idx = categories.firstIndex(of: oldTitle) {
+                categories[idx] = newTitle
+            }
+            if selectedCategory == oldTitle {
+                selectedCategory = newTitle
+                if let new = selectedCategory {
+                    onCategorySelected?(new)
+                }
+            }
+            onCategoriesUpdate?()
+        } catch {
+            handleError(error)
+        }
+    }
+    
+    func deleteCategory(title: String) {
+        do {
+            try categoryStore.deleteCategory(title: title)
+            categories.removeAll { $0 == title }
+            if selectedCategory == title {
+                selectedCategory = nil
+            }
+            onCategoriesUpdate?()
+        } catch {
+            handleError(error)
+        }
+    }
+    
     func selectCategory(at index: Int) {
         guard index >= 0 && index < categories.count else { return }
         selectedCategory = categories[index]
@@ -77,4 +108,3 @@ final class CategoryViewModel {
         }
     }
 }
-

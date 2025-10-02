@@ -102,7 +102,7 @@ final class CategoryListViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableViewHeightConstraint, 
+            tableViewHeightConstraint,
             
             placeholderStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             placeholderStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -50),
@@ -155,6 +155,7 @@ final class CategoryListViewController: UIViewController {
     
     @objc private func addButtonTapped() {
         let addCategoryVC = AddCategoryViewController()
+        addCategoryVC.mode = .create
         addCategoryVC.onCategoryAdded = { [weak self] categoryName in
             self?.viewModel.addNewCategory(title: categoryName)
             self?.selectedCategory = categoryName
@@ -163,6 +164,35 @@ final class CategoryListViewController: UIViewController {
         }
         
         navigationController?.pushViewController(addCategoryVC, animated: true)
+    }
+    
+    private func presentEditController(for oldTitle: String) {
+        let editVC = AddCategoryViewController()
+        editVC.mode = .edit(originalName: oldTitle)
+        editVC.onCategoryRenamed = { [weak self] old, new in
+            guard let self = self else { return }
+            self.viewModel.renameCategory(oldTitle: old, newTitle: new)
+            if self.selectedCategory == old {
+                self.selectedCategory = new
+            }
+        }
+        navigationController?.pushViewController(editVC, animated: true)
+    }
+    
+    private func confirmDeletion(title: String) {
+        let alert = UIAlertController(
+            title: Localizable.Alerts.deleteTitle,
+            message: Localizable.Alerts.deleteMessage,
+            preferredStyle: .actionSheet
+        )
+        alert.addAction(UIAlertAction(title: Localizable.Common.delete, style: .destructive) { [weak self] _ in
+            self?.viewModel.deleteCategory(title: title)
+            if self?.selectedCategory == title {
+                self?.selectedCategory = nil
+            }
+        })
+        alert.addAction(UIAlertAction(title: Localizable.Common.cancel, style: .cancel))
+        present(alert, animated: true)
     }
 }
 
@@ -196,5 +226,30 @@ extension CategoryListViewController: UITableViewDataSource, UITableViewDelegate
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }
+    
+    // MARK: - Context Menu
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let title = viewModel.getCategoryTitle(at: indexPath.row)
+        
+        return UIContextMenuConfiguration(identifier: indexPath as NSIndexPath, previewProvider: nil) { [weak self] _ in
+            guard let self = self else { return UIMenu() }
+            
+            let editAction = UIAction(
+                title: NSLocalizedString("contextMenu.edit", comment: "Edit"),
+                image: UIImage(systemName: "square.and.pencil")
+            ) { _ in
+                self.presentEditController(for: title)
+            }
+            
+            let deleteAction = UIAction(
+                title: Localizable.Common.delete,
+                image: UIImage(systemName: "trash"),
+                attributes: .destructive
+            ) { _ in
+                self.confirmDeletion(title: title)
+            }
+            
+            return UIMenu(title: "", children: [editAction, deleteAction])
+        }
+    }
 }
-

@@ -71,12 +71,60 @@ final class TrackerCategoryStore {
             return TrackerCategory(title: title, trackers: trackers)
         }
     }
+    
+    // MARK: - New: Rename & Delete
+    func renameCategory(from oldTitle: String, to newTitle: String) throws {
+        // Проверка на дубль нового названия
+        if oldTitle != newTitle {
+            let dupRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            dupRequest.predicate = NSPredicate(format: "title == %@", newTitle)
+            if try !context.fetch(dupRequest).isEmpty {
+                throw CategoryError.categoryAlreadyExists
+            }
+        }
+        
+        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", oldTitle)
+        
+        guard let category = try context.fetch(request).first else {
+            throw CategoryError.failedToUpdate
+        }
+        
+        category.title = newTitle
+        
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            throw CategoryError.failedToUpdate
+        }
+    }
+    
+    func deleteCategory(title: String) throws {
+        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", title)
+        
+        guard let category = try context.fetch(request).first else {
+            throw CategoryError.failedToDelete
+        }
+        
+        context.delete(category)
+        
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            throw CategoryError.failedToDelete
+        }
+    }
 }
 
 enum CategoryError: Error, LocalizedError {
     case categoryAlreadyExists
     case failedToSave
     case failedToFetch
+    case failedToDelete
+    case failedToUpdate
     
     var errorDescription: String? {
         switch self {
@@ -86,7 +134,10 @@ enum CategoryError: Error, LocalizedError {
             return Localizable.Errors.failedToSave
         case .failedToFetch:
             return Localizable.Errors.failedToFetch
+        case .failedToDelete:
+            return Localizable.Errors.failedToDelete
+        case .failedToUpdate:
+            return Localizable.Errors.failedToUpdate
         }
     }
 }
-
