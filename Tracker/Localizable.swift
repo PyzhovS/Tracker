@@ -82,7 +82,6 @@ enum Localizable {
     
     enum Onboarding {
         static var actionButton: String { tr("onboarding.actionButton") }
-        // Заголовки слайдов, если будете локализовывать их здесь (по желанию):
         static var page1Title: String { tr("onboarding.page1.title") }
         static var page2Title: String { tr("onboarding.page2.title") }
     }
@@ -103,9 +102,19 @@ enum Localizable {
             trf("dates.days_count", count, comment: "Pluralized number of days")
         }
     }
+    
     enum ContextMenu {
         static var edit: String { tr("contextMenu.edit") }
         static var delete: String { tr("contextMenu.delete") }
     }
     
+    // MARK: - Statistics
+    enum Statistics {
+        static var title: String { tr("statistics.title") }
+        static var empty: String { tr("statistics.empty") }
+        static var bestPeriod: String { tr("statistics.bestPeriod") }
+        static var idealDays: String { tr("statistics.idealDays") }
+        static var completedCount: String { tr("statistics.completedCount") }
+        static var averageValue: String { tr("statistics.averageValue") }
+    }
 }

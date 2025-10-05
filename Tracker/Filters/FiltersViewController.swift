@@ -1,5 +1,76 @@
 import UIKit
 
+// Приватная ячейка с кастомным разделителем
+private final class FilterOptionCell: UITableViewCell {
+    static let reuseId = "FilterOptionCell"
+
+    private let titleLabel: UILabel = {
+        let l = UILabel()
+        l.font = UIFont.systemFont(ofSize: 17)
+        l.textColor = .label
+        return l
+    }()
+
+    private let separatorView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .separator
+        return v
+    }()
+
+    private var separatorHeightConstraint: NSLayoutConstraint!
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupUI()
+        applyTheme()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupUI()
+        applyTheme()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
+    }
+
+    private func setupUI() {
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
+        selectionStyle = .none
+
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(separatorView)
+        [titleLabel, separatorView].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+
+        separatorHeightConstraint = separatorView.heightAnchor.constraint(equalToConstant: 0.5)
+
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -16),
+
+            separatorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            separatorHeightConstraint
+        ])
+    }
+
+    private func applyTheme() {
+        titleLabel.textColor = .label
+        separatorView.backgroundColor = .separator
+    }
+
+    func configure(title: String, isLast: Bool, separatorHeight: CGFloat) {
+        titleLabel.text = title
+        separatorHeightConstraint.constant = separatorHeight
+        separatorView.isHidden = isLast
+    }
+}
+
 final class FiltersViewController: UIViewController {
     
     var onFilterSelected: ((FilterType) -> Void)?
@@ -13,22 +84,25 @@ final class FiltersViewController: UIViewController {
     
     private let selectedFilter: FilterType?
     
-    // Таблица с контролируемой шириной (отступы по 16) и фиксируемой высотой по контенту
+    // Возможность настраивать толщину разделителя между ячейками
+    var separatorThickness: CGFloat = 0.5 {
+        didSet { tableView.reloadData() }
+    }
+    
+    // Таблица с контролируемой шириной и высотой по контенту
     private let tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .plain)
         tv.layer.cornerRadius = 16
         tv.layer.masksToBounds = true
-        tv.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        tv.backgroundColor = .backgroundDay
+        tv.separatorStyle = .none // отключаем системные сепараторы
         tv.tableFooterView = UIView()
-        tv.isScrollEnabled = false // важный момент: высота = контенту, без скролла
+        tv.isScrollEnabled = false
         if #available(iOS 15.0, *) {
             tv.sectionHeaderTopPadding = 0
         }
         return tv
     }()
     
-    // Констрейнт высоты таблицы
     private var tableHeightConstraint: NSLayoutConstraint!
     
     init(selectedFilter: FilterType?) {
@@ -45,25 +119,40 @@ final class FiltersViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
+        applyTheme()
         tableView.reloadData()
         updateTableHeight()
     }
     
-    // На случай смены шрифтов/ориентации — актуализируем высоту
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         updateTableHeight()
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
+    }
+    
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(FilterOptionCell.self, forCellReuseIdentifier: FilterOptionCell.reuseId)
         tableView.dataSource = self
         tableView.delegate = self
         
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    private func applyTheme() {
+        view.backgroundColor = .systemBackground
+        // Фон «карточки» таблицы: в темной теме затемняем
+        if traitCollection.userInterfaceStyle == .dark {
+            tableView.backgroundColor = .secondarySystemBackground
+        } else {
+            tableView.backgroundColor = .backgroundDay
+        }
     }
     
     private func setupConstraints() {
@@ -73,17 +162,15 @@ final class FiltersViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableHeightConstraint // вместо bottomAnchor — фиксируем высоту по контенту
+            tableHeightConstraint
         ])
     }
     
     private func updateTableHeight() {
-        // Высота одной строки — 75 (как в макете)
         let rowHeight: CGFloat = 75
         let totalHeight = rowHeight * CGFloat(options.count)
         if tableHeightConstraint.constant != totalHeight {
             tableHeightConstraint.constant = totalHeight
-            // layoutIfNeeded не обязателен здесь, т.к. метод вызывается и из layoutSubviews
         }
     }
 }
@@ -94,33 +181,23 @@ extension FiltersViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let (type, title) = options[indexPath.row]
-        cell.textLabel?.text = title
-        cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
-        cell.tintColor = .systemBlue
-        cell.backgroundColor = .clear // чтобы просвечивал фон таблицы
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: FilterOptionCell.reuseId, for: indexPath) as? FilterOptionCell else {
+            return UITableViewCell()
+        }
         
-        // Галочка только для активных фильтров (как у вас)
+        let (type, title) = options[indexPath.row]
+        let isLast = indexPath.row == options.count - 1
+        
+        cell.configure(title: title, isLast: isLast, separatorHeight: separatorThickness)
+        cell.tintColor = .systemBlue // цвет галочки
+        
         if let selected = selectedFilter, selected.isActive, selected == type {
             cell.accessoryType = .checkmark
         } else {
             cell.accessoryType = .none
         }
-        return cell
-    }
-    
-    // Прячем разделитель только у последней ячейки — оставляем «внутренние» линии
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let isLast = indexPath.row == options.count - 1
         
-        if isLast {
-            // Скрыть нижний разделитель у последней ячейки
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-        } else {
-            // Оставляем стандартные отступы для внутренних разделителей
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        }
+        return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

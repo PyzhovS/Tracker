@@ -7,7 +7,6 @@ final class TrackerCategoryStore {
         self.context = context
     }
     
-    
     func fetchAllCategories() throws -> [String] {
         let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         let categoriesCoreData = try context.fetch(request)
@@ -30,6 +29,7 @@ final class TrackerCategoryStore {
         
         do {
             try context.save()
+            postCategoriesDidChange()
         } catch {
             context.rollback()
             throw CategoryError.failedToSave
@@ -49,6 +49,7 @@ final class TrackerCategoryStore {
         
         do {
             try context.save()
+            postCategoriesDidChange()
             return newCategory
         } catch {
             context.rollback()
@@ -72,7 +73,7 @@ final class TrackerCategoryStore {
         }
     }
     
-    // MARK: - New: Rename & Delete
+    // MARK: - Rename & Delete
     func renameCategory(from oldTitle: String, to newTitle: String) throws {
         // Проверка на дубль нового названия
         if oldTitle != newTitle {
@@ -94,6 +95,7 @@ final class TrackerCategoryStore {
         
         do {
             try context.save()
+            postCategoriesDidChange()
         } catch {
             context.rollback()
             throw CategoryError.failedToUpdate
@@ -112,10 +114,16 @@ final class TrackerCategoryStore {
         
         do {
             try context.save()
+            postCategoriesDidChange()
         } catch {
             context.rollback()
             throw CategoryError.failedToDelete
         }
+    }
+    
+    // MARK: - Notifications
+    private func postCategoriesDidChange() {
+        NotificationCenter.default.post(name: .trackerCategoriesDidChange, object: nil)
     }
 }
 
@@ -140,4 +148,8 @@ enum CategoryError: Error, LocalizedError {
             return Localizable.Errors.failedToUpdate
         }
     }
+}
+
+extension Notification.Name {
+    static let trackerCategoriesDidChange = Notification.Name("trackerCategoriesDidChange")
 }

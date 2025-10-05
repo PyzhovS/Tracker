@@ -15,6 +15,7 @@ final class ScheduleSelectionViewController: UIViewController {
         label.text = Localizable.Schedule.title
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
+        label.textColor = .label
         return label
     }()
     
@@ -48,11 +49,17 @@ final class ScheduleSelectionViewController: UIViewController {
         setupUI()
         setupConstraints()
         setupActions()
+        applyTheme()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
     }
     
     // MARK: - Private Methods
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.addSubview(titleLabel)
         view.addSubview(tableView)
         view.addSubview(doneButton)
@@ -61,6 +68,21 @@ final class ScheduleSelectionViewController: UIViewController {
          tableView,
          doneButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false}
+    }
+    
+    private func applyTheme() {
+        view.backgroundColor = .systemBackground
+        titleLabel.textColor = .label
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            tableView.backgroundColor = .secondarySystemBackground
+            doneButton.backgroundColor = .white
+            doneButton.setTitleColor(.black, for: .normal)
+        } else {
+            tableView.backgroundColor = .systemBackground // как было
+            doneButton.backgroundColor = .black
+            doneButton.setTitleColor(.white, for: .normal)
+        }
     }
     
     private func setupConstraints() {
@@ -88,8 +110,6 @@ final class ScheduleSelectionViewController: UIViewController {
         onScheduleSelected?(selectedDays)
         dismiss(animated: true)
     }
-    
-    
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate

@@ -6,7 +6,7 @@ final class CategoryTableViewCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17)
-        label.textColor = .black
+        label.textColor = .label // динамический (в светлой = черный)
         label.numberOfLines = 1
         return label
     }()
@@ -21,7 +21,7 @@ final class CategoryTableViewCell: UITableViewCell {
     
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .gray.withAlphaComponent(0.3)
+        // цвет зададим в applyTheme(), чтобы отличать Light/Dark
         return view
     }()
     
@@ -29,10 +29,16 @@ final class CategoryTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
+        applyTheme()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
     }
     
     // MARK: - Private Methods
@@ -61,8 +67,24 @@ final class CategoryTableViewCell: UITableViewCell {
             separatorView.heightAnchor.constraint(equalToConstant: 0.5)
         ])
         
-        backgroundColor = .backgroundDay
         selectionStyle = .none
+    }
+    
+    private func applyTheme() {
+        // Фон ячейки: в светлой — как раньше .backgroundDay, в темной — системный
+        if traitCollection.userInterfaceStyle == .dark {
+            backgroundColor = .secondarySystemBackground
+            contentView.backgroundColor = .secondarySystemBackground
+            separatorView.backgroundColor = .separator
+        } else {
+            backgroundColor = .backgroundDay
+            contentView.backgroundColor = .backgroundDay
+            separatorView.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
+        }
+        
+        // Текст и чекмарка
+        titleLabel.textColor = .label
+        checkmarkImageView.tintColor = .systemBlue
     }
     
     // MARK: - Public Methods
@@ -71,6 +93,7 @@ final class CategoryTableViewCell: UITableViewCell {
         checkmarkImageView.isHidden = !isSelected
         separatorView.isHidden = isLastCell
     }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         titleLabel.text = nil

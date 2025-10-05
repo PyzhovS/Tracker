@@ -16,7 +16,6 @@ final class CategoryListViewController: UIViewController {
         table.layer.cornerRadius = 16
         table.layer.masksToBounds = true
         table.separatorStyle = .none
-        table.backgroundColor = .backgroundDay
         table.isScrollEnabled = false
         return table
     }()
@@ -43,7 +42,7 @@ final class CategoryListViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 12)
         label.textAlignment = .center
         label.numberOfLines = 2
-        label.textColor = .black
+        label.textColor = .secondaryLabel
         return label
     }()
     
@@ -51,8 +50,6 @@ final class CategoryListViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle(Localizable.Category.addButton, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.backgroundColor = .black
-        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         return button
@@ -75,12 +72,17 @@ final class CategoryListViewController: UIViewController {
         setupUI()
         setupConstraints()
         setupBindings()
+        applyTheme()
         viewModel.loadCategories()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
     }
     
     // MARK: - Private Methods
     private func setupUI() {
-        view.backgroundColor = .white
         title = Localizable.Category.title
         
         placeholderStackView.addArrangedSubview(placeholderImageView)
@@ -92,6 +94,32 @@ final class CategoryListViewController: UIViewController {
         
         [tableView, placeholderStackView, addButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+    }
+    
+    private func applyTheme() {
+        // Фон экрана
+        view.backgroundColor = .systemBackground
+        
+        // Фон таблицы: в светлой — как раньше .backgroundDay, в темной — системный
+        if traitCollection.userInterfaceStyle == .dark {
+            tableView.backgroundColor = .secondarySystemBackground
+        } else {
+            tableView.backgroundColor = .backgroundDay
+        }
+        
+        // Плейсхолдеры
+        placeholderLabel.textColor = .secondaryLabel
+        
+        // Кнопка «Добавить категорию»:
+        // Светлая — черная с белым текстом (как было),
+        // Темная — белая с черным текстом (по макету).
+        if traitCollection.userInterfaceStyle == .dark {
+            addButton.backgroundColor = .white
+            addButton.setTitleColor(.black, for: .normal)
+        } else {
+            addButton.backgroundColor = .black
+            addButton.setTitleColor(.white, for: .normal)
         }
     }
     
@@ -109,7 +137,6 @@ final class CategoryListViewController: UIViewController {
             
             placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
             placeholderImageView.heightAnchor.constraint(equalToConstant: 80),
-            
             
             addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -235,15 +262,13 @@ extension CategoryListViewController: UITableViewDataSource, UITableViewDelegate
             guard let self = self else { return UIMenu() }
             
             let editAction = UIAction(
-                title: NSLocalizedString("contextMenu.edit", comment: "Edit"),
-                image: UIImage(systemName: "square.and.pencil")
+                title: NSLocalizedString("contextMenu.edit", comment: "Edit")
             ) { _ in
                 self.presentEditController(for: title)
             }
             
             let deleteAction = UIAction(
                 title: Localizable.Common.delete,
-                image: UIImage(systemName: "trash"),
                 attributes: .destructive
             ) { _ in
                 self.confirmDeletion(title: title)

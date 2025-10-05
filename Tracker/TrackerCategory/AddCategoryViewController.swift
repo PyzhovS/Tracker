@@ -22,13 +22,14 @@ final class AddCategoryViewController: UIViewController {
         label.text = Localizable.AddCategory.title
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
+        label.textColor = .label
         return label
     }()
     
     private lazy var textField: UITextField = {
         let field = UITextField()
         field.placeholder = Localizable.AddCategory.placeholder
-        field.backgroundColor = .backgroundDay
+        field.backgroundColor = .backgroundDay // в светлой теме остается как было
         field.layer.cornerRadius = 16
         field.layer.masksToBounds = true
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
@@ -60,6 +61,7 @@ final class AddCategoryViewController: UIViewController {
         setupConstraints()
         setupGestureRecognizer()
         applyMode()
+        applyTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -79,9 +81,16 @@ final class AddCategoryViewController: UIViewController {
         }
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
+        // Пересчитываем внешний вид кнопки по текущему состоянию
+        updateDoneButtonAppearance(enabled: doneButton.isEnabled)
+    }
+    
     // MARK: - Private Methods
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         view.addSubview(titleLabel)
         view.addSubview(textField)
@@ -90,6 +99,26 @@ final class AddCategoryViewController: UIViewController {
         [titleLabel, textField, doneButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
+    }
+    
+    private func applyTheme() {
+        view.backgroundColor = .systemBackground
+        titleLabel.textColor = .label
+        
+        // Поле ввода: светлая — как было, темная — системный заполнитель
+        if traitCollection.userInterfaceStyle == .dark {
+            textField.backgroundColor = .tertiarySystemFill
+            textField.keyboardAppearance = .dark
+        } else {
+            textField.backgroundColor = .backgroundDay
+            textField.keyboardAppearance = .light
+        }
+        textField.textColor = .label
+        textField.tintColor = .label
+        textField.attributedPlaceholder = NSAttributedString(
+            string: Localizable.AddCategory.placeholder,
+            attributes: [.foregroundColor: UIColor.secondaryLabel]
+        )
     }
     
     private func setupConstraints() {
@@ -122,12 +151,27 @@ final class AddCategoryViewController: UIViewController {
             textField.text = ""
             textField.placeholder = Localizable.AddCategory.placeholder
             doneButton.isEnabled = false
-            doneButton.backgroundColor = .ypGray
+            updateDoneButtonAppearance(enabled: false)
             
         case .edit(let originalName):
             titleLabel.text = NSLocalizedString("editCategory.title", comment: "Edit category title")
             textField.text = originalName
             validate(text: originalName)
+        }
+    }
+    
+    private func updateDoneButtonAppearance(enabled: Bool) {
+        if enabled {
+            if traitCollection.userInterfaceStyle == .dark {
+                doneButton.backgroundColor = .white
+                doneButton.setTitleColor(.black, for: .normal)
+            } else {
+                doneButton.backgroundColor = .black
+                doneButton.setTitleColor(.white, for: .normal)
+            }
+        } else {
+            doneButton.backgroundColor = .ypGray
+            doneButton.setTitleColor(.white, for: .normal)
         }
     }
     
@@ -137,11 +181,11 @@ final class AddCategoryViewController: UIViewController {
         case .create:
             let enabled = !trimmed.isEmpty
             doneButton.isEnabled = enabled
-            doneButton.backgroundColor = enabled ? .black : .ypGray
+            updateDoneButtonAppearance(enabled: enabled)
         case .edit(let originalName):
             let enabled = !trimmed.isEmpty && trimmed != originalName
             doneButton.isEnabled = enabled
-            doneButton.backgroundColor = enabled ? .black : .ypGray
+            updateDoneButtonAppearance(enabled: enabled)
         }
     }
     

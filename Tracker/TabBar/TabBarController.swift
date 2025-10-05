@@ -13,7 +13,9 @@ class AppTabBarController: UITabBarController {
         let firstVC = createNavController(for: trackerController,
                                           title: Localizable.Tabbar.trackers,
                                           image: UIImage(resource: .tab1))
-        let thirdVC = createNavController(for: ThirdViewController(),
+        
+        let statisticsController = StatisticsViewController()
+        let thirdVC = createNavController(for: statisticsController,
                                           title: Localizable.Tabbar.statistics,
                                           image: UIImage(resource: .tab2))
         
@@ -44,13 +46,5 @@ class AppTabBarController: UITabBarController {
         navController.tabBarItem.title = title
         navController.tabBarItem.image = image
         return navController
-    }
-}
-
-// MARK: - ThirdViewController
-class ThirdViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
     }
 }

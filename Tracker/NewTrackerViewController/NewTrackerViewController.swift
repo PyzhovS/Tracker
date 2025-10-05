@@ -8,39 +8,31 @@ final class NewTrackerViewController: UIViewController {
     }
     
     var mode: Mode = .create
-    var onTrackerUpdated: ((Tracker, String) -> Void)? // передаем и категорию наружу
+    var onTrackerUpdated: ((Tracker, String) -> Void)?
+    var onTrackerCreated: ((Tracker, String) -> Void)?
+    
+    private var viewModel: NewTrackerViewModel!
     
     private let menuItems = [Localizable.NewTracker.category, Localizable.NewTracker.schedule]
-    var onTrackerCreated: ((Tracker, String) -> Void)?
-    private var currentSchedule: [WeekDay] = []
-    private var selectedCategory: String?
-    private var selectedEmoji: String? = nil
-    private var selectedColor: UIColor? = nil
-    private let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
-    private let colors: [UIColor] = [
-        .colorSelection1, .colorSelection2, .colorSelection3, .colorSelection4, .colorSelection5, .colorSelection6,
-        .colorSelection7, .colorSelection8, .colorSelection9, .colorSelection10, .colorSelection11, .colorSelection12,
-        .colorSelection13, .colorSelection14, .colorSelection15, .colorSelection16, .colorSelection17, .colorSelection18
-    ]
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = Localizable.NewTracker.title
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
+        label.textColor = .label
         return label
     }()
     
     private lazy var nameTextField: UITextField = {
         let field = UITextField()
         field.placeholder = Localizable.NewTracker.namePlaceholder
-        field.backgroundColor = .backgroundDay
         field.layer.cornerRadius = 16
         field.layer.masksToBounds = true
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
         field.leftViewMode = .always
         field.font = UIFont.systemFont(ofSize: 17)
-        field.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        field.addTarget(self, action: #selector(nameChanged), for: .editingChanged)
         return field
     }()
     
@@ -52,7 +44,6 @@ final class NewTrackerViewController: UIViewController {
         table.layer.masksToBounds = true
         table.separatorStyle = .none
         table.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        table.backgroundColor = .backgroundDay
         table.delegate = self
         table.dataSource = self
         table.tableFooterView = UIView()
@@ -64,6 +55,7 @@ final class NewTrackerViewController: UIViewController {
         label.text = Localizable.NewTracker.emojiTitle
         label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
         label.textAlignment = .left
+        label.textColor = .label
         return label
     }()
     
@@ -78,6 +70,10 @@ final class NewTrackerViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.isScrollEnabled = false
+        collectionView.allowsMultipleSelection = false
+        if #available(iOS 10.0, *) {
+            collectionView.isPrefetchingEnabled = false
+        }
         return collectionView
     }()
     
@@ -86,6 +82,7 @@ final class NewTrackerViewController: UIViewController {
         label.text = Localizable.NewTracker.colorTitle
         label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
         label.textAlignment = .left
+        label.textColor = .label
         return label
     }()
     
@@ -100,6 +97,10 @@ final class NewTrackerViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.isScrollEnabled = false
+        collectionView.allowsMultipleSelection = false
+        if #available(iOS 10.0, *) {
+            collectionView.isPrefetchingEnabled = false
+        }
         return collectionView
     }()
     
@@ -151,32 +152,50 @@ final class NewTrackerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Инициализируем ViewModel из текущего режима
+        viewModel = NewTrackerViewModel(mode: convertMode(mode))
+        bindViewModel()
+        
         setupUI()
         setupConstraints()
         setupGestureRecognizer()
+        applyTheme()
         
-        if case .edit(let tracker, let categoryTitle) = mode {
-            populateWithTrackerData(tracker, categoryTitle: categoryTitle)
-        }
-    }
-    
-    private func populateWithTrackerData(_ tracker: Tracker, categoryTitle: String) {
-        nameTextField.text = tracker.title
-        selectedEmoji = tracker.emoji
-        selectedColor = tracker.color
-        currentSchedule = tracker.schedule ?? []
-        selectedCategory = categoryTitle
-        
+        // Префилл UI из VM (при редактировании)
+        nameTextField.text = viewModel.name
         tableView.reloadData()
         emojiCollectionView.reloadData()
         colorCollectionView.reloadData()
-        viewHeightConstraint()
-        textFieldDidChange()
+        updateCreateButtonAppearance()
+        updateTableHeight()
+    }
+    
+    private func convertMode(_ m: Mode) -> NewTrackerViewModel.Mode {
+        switch m {
+        case .create: return .create
+        case .edit(let t, let c): return .edit(t, c)
+        }
+    }
+    
+    private func bindViewModel() {
+        viewModel.onChange = { [weak self] in
+            guard let self else { return }
+            // ВАЖНО: не перезагружаем коллекции эмодзи/цветов здесь,
+            // чтобы избежать «мигания» при точечных изменениях выбора.
+            self.updateCreateButtonAppearance()
+            self.tableView.reloadData()
+            self.updateTableHeight()
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
+        updateCreateButtonAppearance()
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
-        
         view.addSubview(scrollView)
         
         contentView.addSubview(titleLabel)
@@ -263,23 +282,59 @@ final class NewTrackerViewController: UIViewController {
         ])
     }
     
-    @objc private func textFieldDidChange() {
-        let maxText = 38
-        let text = nameTextField.text ?? ""
-        let isNameEntered = !text.isEmpty && text.count <= maxText
-        let hasSchedule = !currentSchedule.isEmpty
-        let isEmojiSelected = selectedEmoji != nil
-        let isColorSelected = selectedColor != nil
+    private func applyTheme() {
+        // Фоны
+        view.backgroundColor = .systemBackground
+        scrollView.backgroundColor = .clear
+        contentView.backgroundColor = .clear
         
-        let requiresCategory: Bool = {
-            if case .create = mode { return true } else { return false }
-        }()
-        let isCategoryOK = requiresCategory ? (selectedCategory != nil) : true
+        // Поле имени
+        if traitCollection.userInterfaceStyle == .dark {
+            nameTextField.backgroundColor = .tertiarySystemFill
+            nameTextField.keyboardAppearance = .dark
+        } else {
+            nameTextField.backgroundColor = .backgroundDay
+            nameTextField.keyboardAppearance = .light
+        }
+        nameTextField.textColor = .label
+        nameTextField.tintColor = .label
+        nameTextField.attributedPlaceholder = NSAttributedString(
+            string: Localizable.NewTracker.namePlaceholder,
+            attributes: [.foregroundColor: UIColor.secondaryLabel]
+        )
         
-        let isEnable = hasSchedule && isNameEntered && isEmojiSelected && isColorSelected && isCategoryOK
+        // Таблица
+        tableView.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .secondarySystemBackground : .backgroundDay
         
-        createButton.isEnabled = isEnable
-        createButton.backgroundColor = isEnable ? .black : .ypGray
+        // Заголовки секций
+        emojiLabel.textColor = .label
+        colorLabel.textColor = .label
+        
+        // Кнопки
+        cancelButton.setTitleColor(.ypRed, for: .normal)
+        cancelButton.layer.borderColor = UIColor.ypRed.cgColor
+    }
+    
+    private func updateCreateButtonAppearance() {
+        let enabled = viewModel.isCreateEnabled
+        createButton.isEnabled = enabled
+        
+        if enabled {
+            if traitCollection.userInterfaceStyle == .dark {
+                createButton.backgroundColor = .white
+                createButton.setTitleColor(.black, for: .normal)
+            } else {
+                createButton.backgroundColor = .black
+                createButton.setTitleColor(.white, for: .normal)
+            }
+        } else {
+            createButton.backgroundColor = .ypGray
+            createButton.setTitleColor(.white, for: .normal)
+        }
+    }
+    
+    @objc private func nameChanged() {
+        viewModel.setName(nameTextField.text ?? "")
     }
     
     @objc private func cancelButtonTapped() {
@@ -287,33 +342,13 @@ final class NewTrackerViewController: UIViewController {
     }
     
     @objc private func createButtonTapped() {
-        guard let name = nameTextField.text, !name.isEmpty,
-              let emoji = selectedEmoji,
-              let color = selectedColor else { return }
-        
-        let id: UUID
-        switch mode {
-        case .create:
-            id = UUID()
-        case .edit(let existing, _):
-            id = existing.id
-        }
-        
-        let newTracker = Tracker(
-            id: id,
-            title: name,
-            emoji: emoji,
-            color: color,
-            schedule: currentSchedule
-        )
+        guard let result = viewModel.makeResult() else { return }
         
         switch mode {
         case .create:
-            guard let category = selectedCategory else { return }
-            onTrackerCreated?(newTracker, category)
-        case .edit(_, let originalCategory):
-            let categoryToSave = selectedCategory ?? originalCategory
-            onTrackerUpdated?(newTracker, categoryToSave)
+            onTrackerCreated?(result.tracker, result.category)
+        case .edit:
+            onTrackerUpdated?(result.tracker, result.category)
         }
         
         dismiss(animated: true)
@@ -322,17 +357,14 @@ final class NewTrackerViewController: UIViewController {
     @objc private func categoryButtonTapped() {
         hideKeyboard()
         
-        let viewModel = CategoryViewModel(selectedCategory: selectedCategory)
-        let categoryVC = CategoryListViewController(selectedCategory: selectedCategory, viewModel: viewModel)
+        let viewModelCategory = CategoryViewModel(selectedCategory: viewModel.selectedCategoryTitle)
+        let categoryVC = CategoryListViewController(selectedCategory: viewModel.selectedCategoryTitle, viewModel: viewModelCategory)
         
-        viewModel.onCategorySelected = { [weak self] selectedCategory in
-            self?.selectedCategory = selectedCategory
-            
+        viewModelCategory.onCategorySelected = { [weak self] selectedCategory in
+            self?.viewModel.selectCategory(selectedCategory)
             if let cell = self?.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? CustomTableViewCell {
                 cell.configure(title: Localizable.NewTracker.category, subtitle: selectedCategory)
             }
-            self?.textFieldDidChange()
-            
             self?.dismiss(animated: true)
         }
         
@@ -342,31 +374,22 @@ final class NewTrackerViewController: UIViewController {
     
     @objc private func scheduleButtonTapped() {
         let scheduleVC = ScheduleSelectionViewController()
-        scheduleVC.selectedDays = currentSchedule
+        scheduleVC.selectedDays = viewModel.schedule
         scheduleVC.onScheduleSelected = { [weak self] selectedDays in
-            self?.currentSchedule = selectedDays
+            self?.viewModel.setSchedule(selectedDays)
             self?.tableView.reloadRows(at: [IndexPath(row: 1, section: 0)], with: .automatic)
-            self?.textFieldDidChange()
-            self?.viewHeightConstraint()
+            self?.updateTableHeight()
         }
         
         let navVC = UINavigationController(rootViewController: scheduleVC)
         present(navVC, animated: true)
     }
     
-    private func viewHeightConstraint() {
-        tableViewHeightConstraint.constant = currentSchedule.isEmpty ? 150 : 165
+    private func updateTableHeight() {
+        tableViewHeightConstraint.constant = viewModel.scheduleIsEmpty ? 150 : 165
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
-    }
-    
-    private func formatSelectedDays(_ days: [WeekDay]) -> String {
-        if days.count == WeekDay.allCases.count {
-            return Localizable.NewTracker.everyDay
-        }
-        let sortedDays = days.sorted { $0.rawValue < $1.rawValue }
-        return sortedDays.map { $0.shortName }.joined(separator: ", ")
     }
 }
 
@@ -385,9 +408,9 @@ extension NewTrackerViewController: UITableViewDataSource, UITableViewDelegate {
         var subtitle: String? = nil
         
         if indexPath.row == 0 {
-            subtitle = selectedCategory
+            subtitle = viewModel.selectedCategoryTitle
         } else if indexPath.row == 1 {
-            subtitle = currentSchedule.isEmpty ? nil : formatSelectedDays(currentSchedule)
+            subtitle = viewModel.selectedDaysText
         }
         
         let isLastCell = indexPath.row == menuItems.count - 1
@@ -396,7 +419,7 @@ extension NewTrackerViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.row == 1 && !currentSchedule.isEmpty {
+        if indexPath.row == 1 && !viewModel.scheduleIsEmpty {
             return 90
         }
         return 75
@@ -422,9 +445,9 @@ extension NewTrackerViewController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojiCollectionView {
-            return emojis.count
+            return viewModel.emojis.count
         } else {
-            return colors.count
+            return viewModel.colors.count
         }
     }
     
@@ -433,15 +456,17 @@ extension NewTrackerViewController: UICollectionViewDataSource, UICollectionView
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as? EmojiCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            let emoji = emojis[indexPath.item]
-            cell.configure(with: emoji, isSelected: emoji == selectedEmoji)
+            let emoji = viewModel.emojis[indexPath.item]
+            let isSelected = (indexPath.item == viewModel.selectedEmojiIndex)
+            cell.configure(with: emoji, isSelected: isSelected)
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as? ColorCollectionViewCell else {
                 return UICollectionViewCell()
             }
-            let color = colors[indexPath.item]
-            cell.configure(with: color, isSelected: color == selectedColor)
+            let color = viewModel.colors[indexPath.item]
+            let isSelected = (indexPath.item == viewModel.selectedColorIndex)
+            cell.configure(with: color, isSelected: isSelected)
             return cell
         }
     }
@@ -452,12 +477,36 @@ extension NewTrackerViewController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == emojiCollectionView {
-            selectedEmoji = emojis[indexPath.item]
+            let previous = viewModel.selectedEmojiIndex
+            viewModel.selectEmoji(at: indexPath.item)
+            let current = viewModel.selectedEmojiIndex
+            
+            var toReload: [IndexPath] = []
+            if let previous = previous {
+                toReload.append(IndexPath(item: previous, section: 0))
+            }
+            toReload.append(IndexPath(item: indexPath.item, section: 0))
+            
+            UIView.performWithoutAnimation {
+                emojiCollectionView.reloadItems(at: toReload)
+            }
+            updateCreateButtonAppearance()
         } else {
-            selectedColor = colors[indexPath.item]
+            let previous = viewModel.selectedColorIndex
+            viewModel.selectColor(at: indexPath.item)
+            let current = viewModel.selectedColorIndex
+            
+            var toReload: [IndexPath] = []
+            if let previous = previous {
+                toReload.append(IndexPath(item: previous, section: 0))
+            }
+            toReload.append(IndexPath(item: indexPath.item, section: 0))
+            
+            UIView.performWithoutAnimation {
+                colorCollectionView.reloadItems(at: toReload)
+            }
+            updateCreateButtonAppearance()
         }
-        collectionView.reloadData()
-        textFieldDidChange()
     }
 }
 
@@ -474,4 +523,3 @@ extension WeekDay {
         }
     }
 }
-

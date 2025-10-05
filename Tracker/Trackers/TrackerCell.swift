@@ -16,7 +16,7 @@ final class TrackerCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
-        label.backgroundColor = .white.withAlphaComponent(0.3)
+        label.backgroundColor = UIColor.white.withAlphaComponent(0.3)
         label.layer.cornerRadius = 12
         label.clipsToBounds = true
         return label
@@ -33,7 +33,7 @@ final class TrackerCell: UICollectionViewCell {
     private let daysLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 12)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -58,7 +58,7 @@ final class TrackerCell: UICollectionViewCell {
     
     // MARK: - Private Methods
     private func setupUI() {
-        contentView.backgroundColor = .white
+        contentView.backgroundColor = .systemBackground
         contentView.layer.cornerRadius = 12
         contentView.clipsToBounds = true
         
@@ -117,4 +117,3 @@ final class TrackerCell: UICollectionViewCell {
         completionHandler?()
     }
 }
-

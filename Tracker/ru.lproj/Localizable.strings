@@ -52,14 +52,15 @@
 "newTracker.schedule" = "Расписание";
 "newTracker.everyDay" = "Каждый день";
 
+/* Onboarding */
 "onboarding.actionButton" = "Вот это технологии!";
+"onboarding.page1.title" = "Отслеживайте только то, что хотите";
+"onboarding.page2.title" = "Даже если это не литры воды и йога";
+
+/* Trackers */
 "trackers.title" = "Трекеры";
 "trackers.searchPlaceholder" = "Поиск";
 "trackers.emptyTitle" = "Что будем отслеживать?";
-
-/* Onboarding*/
-"onboarding.page1.title" = "Отслеживайте только то, что хотите";
-"onboarding.page2.title" = "Даже если это не литры воды и йога";
 
 /* Tab Bar */
 "trackers.tabbar" = "Трекеры";
@@ -71,7 +72,7 @@
 "filters.all" = "Все трекеры";
 "filters.today" = "Трекеры на сегодня";
 "filters.completed" = "Завершённые";
-"filters.incompleted" = "Незавершённые";
+"filters.incompleted" = "Не завершённые";
 
 /* Empty states */
 "empty.nothingFound" = "Ничего не найдено";
@@ -90,3 +91,11 @@
 /* Errors */
 "errors.failedToDelete" = "Не удалось удалить трекер";
 "errors.failedToUpdate" = "Не удалось обновить трекер";
+
+/* Statistics */
+"statistics.title" = "Статистика";
+"statistics.empty" = "Анализировать пока нечего";
+"statistics.bestPeriod" = "Лучший период";
+"statistics.idealDays" = "Идеальные дни";
+"statistics.completedCount" = "Трекеров завершено";
+"statistics.averageValue" = "Среднее значение";
