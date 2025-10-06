@@ -133,7 +133,6 @@ final class AlpabetTests: XCTestCase {
         )
 
         try trackerStore.addTracker(t1, to: "Health")
-     //   try trackerStore.addTracker(t2, to: "Health")
     }
 
   

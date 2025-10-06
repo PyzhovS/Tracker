@@ -35,6 +35,16 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         updateFilterButtonAppearance()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Analytics.shared.log(event: .open, screen: .main, item: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        Analytics.shared.log(event: .close, screen: .main, item: nil)
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         updateCollectionInsets()
@@ -222,6 +232,8 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     }
     
     @objc private func addTrackerTapped() {
+        Analytics.shared.log(event: .click, screen: .main, item: .addTrack)
+        
         let newTrackerVC = NewTrackerViewController()
         newTrackerVC.onTrackerCreated = { [weak self] tracker, category in
             self?.viewModel.addTracker(tracker, in: category)
@@ -230,6 +242,8 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     }
     
     @objc private func filtersButtonTapped() {
+        Analytics.shared.log(event: .click, screen: .main, item: .filter)
+        
         let vc = FiltersViewController(selectedFilter: viewModel.currentFilter)
         vc.onFilterSelected = { [weak self] filter in
             self?.applySelectedFilter(filter)
@@ -330,6 +344,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         )
         
         cell.completionHandler = { [weak self] in
+            Analytics.shared.log(event: .click, screen: .main, item: .track)
             self?.viewModel.toggleCompletion(for: item.id)
         }
         
@@ -395,6 +410,7 @@ extension TrackersViewController: UICollectionViewDelegate {
             let editAction = UIAction(
                 title: Localizable.ContextMenu.edit
             ) { [weak self] _ in
+                Analytics.shared.log(event: .click, screen: .main, item: .edit)
                 self?.editTracker(item, at: indexPath)
             }
             
@@ -402,6 +418,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                 title: Localizable.Common.delete,
                 attributes: .destructive
             ) { [weak self] _ in
+                Analytics.shared.log(event: .click, screen: .main, item: .delete)
                 self?.confirmDeleteTracker(item, at: indexPath)
             }
             
