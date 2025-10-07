@@ -8,7 +8,7 @@ final class TrackersViewModel: NSObject {
         let title: String
         let emoji: String
         let color: UIColor
-        let schedule: [WeekDay]? // нужно для редактирования
+        let schedule: [WeekDay]?
         let completedDays: Int
         let isCompleted: Bool
         let isActive: Bool
@@ -61,7 +61,6 @@ final class TrackersViewModel: NSObject {
                                                name: .trackerCategoriesDidChange,
                                                object: nil)
         
-        // восстановим сохраненный фильтр
         self.internalCurrentFilter = filterStorage.current
     }
     

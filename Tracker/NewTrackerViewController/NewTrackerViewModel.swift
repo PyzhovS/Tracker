@@ -4,13 +4,11 @@ final class NewTrackerViewModel {
     
     enum Mode {
         case create
-        case edit(Tracker, String) // (текущий трекер, его категория)
+        case edit(Tracker, String, Int)
     }
     
-    // MARK: - Outputs
     var onChange: (() -> Void)?
     
-    // MARK: - Public read-only state for View
     private(set) var mode: Mode
     private(set) var name: String = ""
     private(set) var selectedCategory: String?
@@ -18,7 +16,6 @@ final class NewTrackerViewModel {
     private(set) var selectedEmoji: String?
     private(set) var selectedColor: UIColor?
     
-    // Наборы для UI
     let emojis = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     let colors: [UIColor] = [
         .colorSelection1, .colorSelection2, .colorSelection3, .colorSelection4, .colorSelection5, .colorSelection6,
@@ -26,11 +23,14 @@ final class NewTrackerViewModel {
         .colorSelection13, .colorSelection14, .colorSelection15, .colorSelection16, .colorSelection17, .colorSelection18
     ]
     
-    // Для режима редактирования — сохраняем id и исходную категорию
     private var originalId: UUID?
     private var originalCategory: String?
+    private var originalName: String?
+    private var originalEmoji: String?
+    private var originalColor: UIColor?
+    private var originalSchedule: [WeekDay] = []
+    private var completedDays: Int?
     
-    // MARK: - Derived
     var selectedEmojiIndex: Int? {
         guard let value = selectedEmoji else { return nil }
         return emojis.firstIndex(of: value)
@@ -51,6 +51,35 @@ final class NewTrackerViewModel {
         return sorted.map { $0.shortName }.joined(separator: ", ")
     }
     
+    var daysCountText: String? {
+        guard let completedDays else { return nil }
+        return Localizable.Dates.daysCount(completedDays)
+    }
+    
+    private var hasChanges: Bool {
+        switch mode {
+        case .create:
+            return true
+        case .edit:
+            let nameChanged = name != (originalName ?? "")
+            let emojiChanged = selectedEmoji != originalEmoji
+            let colorChanged: Bool = {
+                switch (selectedColor, originalColor) {
+                case (nil, nil): return false
+                case (let a?, let b?): return !a.isEqual(b)
+                default: return true
+                }
+            }()
+            let scheduleChanged: Bool = {
+                let lhs = schedule.sorted { $0.rawValue < $1.rawValue }
+                let rhs = originalSchedule.sorted { $0.rawValue < $1.rawValue }
+                return lhs != rhs
+            }()
+            let categoryChanged = selectedCategory != originalCategory
+            return nameChanged || emojiChanged || colorChanged || scheduleChanged || categoryChanged
+        }
+    }
+    
     var isCreateEnabled: Bool {
         let maxLen = 38
         let isNameOK = !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && name.count <= maxLen
@@ -66,15 +95,25 @@ final class NewTrackerViewModel {
         }()
         let isCategoryOK = requiresCategory ? (selectedCategory != nil) : true
         
-        return isNameOK && hasSchedule && hasEmoji && hasColor && isCategoryOK
+        switch mode {
+        case .create:
+            return isNameOK && hasSchedule && hasEmoji && hasColor && isCategoryOK
+        case .edit:
+            return isNameOK && hasSchedule && hasEmoji && hasColor && isCategoryOK && hasChanges
+        }
     }
     
-    // MARK: - Init
     init(mode: Mode = .create) {
         self.mode = mode
-        if case .edit(let tracker, let category) = mode {
+        if case .edit(let tracker, let category, let days) = mode {
             self.originalId = tracker.id
             self.originalCategory = category
+            self.originalName = tracker.title
+            self.originalEmoji = tracker.emoji
+            self.originalColor = tracker.color
+            self.originalSchedule = tracker.schedule ?? []
+            self.completedDays = days
+            
             self.name = tracker.title
             self.selectedEmoji = tracker.emoji
             self.selectedColor = tracker.color
@@ -83,7 +122,6 @@ final class NewTrackerViewModel {
         }
     }
     
-    // MARK: - Inputs
     func setName(_ text: String) {
         name = text
         onChange?()
@@ -111,7 +149,6 @@ final class NewTrackerViewModel {
         onChange?()
     }
     
-    // MARK: - Result builder
     func makeResult() -> (tracker: Tracker, category: String)? {
         guard isCreateEnabled,
               let emoji = selectedEmoji,
@@ -133,7 +170,6 @@ final class NewTrackerViewModel {
             schedule: schedule
         )
         
-        // Категория: для .edit — используем выбранную, иначе — исходную
         let categoryToUse: String = {
             switch mode {
             case .create:
@@ -146,3 +182,4 @@ final class NewTrackerViewModel {
         return (tracker, categoryToUse)
     }
 }
+

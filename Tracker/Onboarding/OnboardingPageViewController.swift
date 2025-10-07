@@ -1,9 +1,11 @@
 import UIKit
 
+// MARK: - OnboardingPageViewControllerDelegate
 protocol OnboardingPageViewControllerDelegate: AnyObject {
     func onboardingDidFinish()
 }
 
+// MARK: - OnboardingPageViewController
 final class OnboardingPageViewController: UIPageViewController {
     
     // MARK: - Properties
@@ -63,6 +65,7 @@ final class OnboardingPageViewController: UIPageViewController {
         ])
     }
     
+    // MARK: - Actions
     @objc private func pageControlTapped(_ sender: UIPageControl) {
         let direction: UIPageViewController.NavigationDirection
         if sender.currentPage > currentIndex {
@@ -85,6 +88,7 @@ final class OnboardingPageViewController: UIPageViewController {
         }
     }
     
+    // MARK: - Navigation
     func completeOnboarding() {
         UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
         

@@ -3,13 +3,11 @@ import UIKit
 
 final class ScheduleSelectionViewController: UIViewController {
     
-    // MARK: - Properties
     var selectedDays: [WeekDay] = []
     var onScheduleSelected: (([WeekDay]) -> Void)?
     
     private let daysOfWeek = WeekDay.allCases
     
-    // MARK: - UI Elements
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = Localizable.Schedule.title
@@ -43,7 +41,6 @@ final class ScheduleSelectionViewController: UIViewController {
         return button
     }()
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -57,7 +54,6 @@ final class ScheduleSelectionViewController: UIViewController {
         applyTheme()
     }
     
-    // MARK: - Private Methods
     private func setupUI() {
         view.backgroundColor = .systemBackground
         view.addSubview(titleLabel)
@@ -79,7 +75,7 @@ final class ScheduleSelectionViewController: UIViewController {
             doneButton.backgroundColor = .white
             doneButton.setTitleColor(.black, for: .normal)
         } else {
-            tableView.backgroundColor = .systemBackground // как было
+            tableView.backgroundColor = .systemBackground
             doneButton.backgroundColor = .black
             doneButton.setTitleColor(.white, for: .normal)
         }

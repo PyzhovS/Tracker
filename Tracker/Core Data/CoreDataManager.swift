@@ -1,8 +1,11 @@
 import CoreData
 
+// MARK: - CoreDataManager
 final class CoreDataManager {
+    // MARK: - Shared Instance
     static let shared = CoreDataManager()
     
+    // MARK: - Persistent Container
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Tracker")
         container.loadPersistentStores { description, error in
@@ -14,10 +17,12 @@ final class CoreDataManager {
         return container
     }()
     
+    // MARK: - Context
     var context: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
+    // MARK: - Saving
     func saveContext() {
         let context = persistentContainer.viewContext
         if context.hasChanges {

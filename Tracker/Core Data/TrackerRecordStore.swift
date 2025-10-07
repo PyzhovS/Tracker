@@ -7,7 +7,6 @@ final class TrackerRecordStore {
         self.context = context
     }
     
-    // Проверка существования записи для трекера в конкретный день
     private func recordExists(trackerId: UUID, on date: Date) throws -> Bool {
         let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         let calendar = Calendar.current
@@ -24,7 +23,7 @@ final class TrackerRecordStore {
     }
     
     func addRecord(_ record: TrackerRecord) throws {
-        // Предотвращаем дублирование записи в один и тот же день
+       
         if try recordExists(trackerId: record.trackerId, on: record.date) {
             return
         }

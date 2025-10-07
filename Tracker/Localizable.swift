@@ -1,6 +1,8 @@
 import Foundation
 
+// MARK: - Localizable
 enum Localizable {
+    // MARK: - Base Translators
     // Base translator
     private static func tr(_ key: String, comment: String = "") -> String {
         NSLocalizedString(key, tableName: "Localizable", bundle: .main, value: "", comment: comment)
@@ -11,6 +13,7 @@ enum Localizable {
         return String(format: format, locale: Locale.current, arguments: args)
     }
     
+    // MARK: - Common
     enum Common {
         static var done: String { tr("common.done", comment: "Action: Done") }
         static var cancel: String { tr("common.cancel", comment: "Action: Cancel") }
@@ -19,12 +22,14 @@ enum Localizable {
         static var delete: String { tr("common.delete", comment: "Action: Delete") }
     }
     
+    // MARK: - Alerts
     enum Alerts {
         static var errorTitle: String { tr("alerts.errorTitle", comment: "Title for error alert") }
         static var deleteTitle: String { tr("alerts.deleteTitle") }
         static var deleteMessage: String { tr("alerts.deleteMessage") }
     }
     
+    // MARK: - Errors
     enum Errors {
         static var categoryAlreadyExists: String { tr("errors.categoryAlreadyExists") }
         static var failedToSave: String { tr("errors.failedToSave") }
@@ -34,6 +39,7 @@ enum Localizable {
         
     }
     
+    // MARK: - Weekday
     enum Weekday {
         static var monday: String { tr("weekday.monday") }
         static var tuesday: String { tr("weekday.tuesday") }
@@ -44,6 +50,7 @@ enum Localizable {
         static var sunday: String { tr("weekday.sunday") }
     }
     
+    // MARK: - WeekdayShort
     enum WeekdayShort {
         static var monday: String { tr("weekdayShort.monday") }
         static var tuesday: String { tr("weekdayShort.tuesday") }
@@ -54,21 +61,25 @@ enum Localizable {
         static var sunday: String { tr("weekdayShort.sunday") }
     }
     
+    // MARK: - AddCategory
     enum AddCategory {
         static var title: String { tr("addCategory.title") }
         static var placeholder: String { tr("addCategory.placeholder") }
     }
     
+    // MARK: - Schedule
     enum Schedule {
         static var title: String { tr("schedule.title") }
     }
     
+    // MARK: - Category
     enum Category {
         static var title: String { tr("category.title") }
         static var placeholderText: String { tr("category.placeholderText") }
         static var addButton: String { tr("category.addButton") }
     }
     
+    // MARK: - NewTracker
     enum NewTracker {
         static var title: String { tr("newTracker.title") }
         static var namePlaceholder: String { tr("newTracker.namePlaceholder") }
@@ -80,29 +91,41 @@ enum Localizable {
         static var everyDay: String { tr("newTracker.everyDay") }
     }
     
+    // MARK: - EditTracker
+    // Экран редактирования
+    enum EditTracker {
+        static var title: String { tr("editTracker.title") } // "Редактирование привычки"
+        static var save: String { tr("editTracker.save") }   // "Сохранить"
+    }
+    
+    // MARK: - Onboarding
     enum Onboarding {
         static var actionButton: String { tr("onboarding.actionButton") }
         static var page1Title: String { tr("onboarding.page1.title") }
         static var page2Title: String { tr("onboarding.page2.title") }
     }
     
+    // MARK: - Trackers
     enum Trackers {
         static var title: String { tr("trackers.title") }
         static var searchPlaceholder: String { tr("trackers.searchPlaceholder") }
         static var emptyTitle: String { tr("trackers.emptyTitle") }
     }
     
+    // MARK: - Tabbar
     enum Tabbar {
         static var statistics: String { tr("statistics.tabbar") }
         static var trackers: String { tr("trackers.tabbar") }
     }
     
+    // MARK: - Dates
     enum Dates {
         static func daysCount(_ count: Int) -> String {
             trf("dates.days_count", count, comment: "Pluralized number of days")
         }
     }
     
+    // MARK: - ContextMenu
     enum ContextMenu {
         static var edit: String { tr("contextMenu.edit") }
         static var delete: String { tr("contextMenu.delete") }

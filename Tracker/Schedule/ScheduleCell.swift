@@ -12,7 +12,7 @@ final class ScheduleCell: UITableViewCell {
     
     private let switchControl: UISwitch = {
         let switchControl = UISwitch()
-        switchControl.onTintColor = .ypBlue // брендовый цвет, оставляем
+        switchControl.onTintColor = .ypBlue
         return switchControl
     }()
     
@@ -53,8 +53,7 @@ final class ScheduleCell: UITableViewCell {
     }
     
     private func applyTheme() {
-        // Светлую тему не меняем — у вас был .backgroundDay.
-        // В темной — используем системный фон карточки.
+
         if traitCollection.userInterfaceStyle == .dark {
             backgroundColor = .secondarySystemBackground
             contentView.backgroundColor = .secondarySystemBackground

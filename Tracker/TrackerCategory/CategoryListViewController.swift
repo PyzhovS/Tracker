@@ -2,12 +2,10 @@ import UIKit
 
 final class CategoryListViewController: UIViewController {
     
-    // MARK: - Properties
     let viewModel: CategoryViewModel
     private var selectedCategory: String?
     private var tableViewHeightConstraint: NSLayoutConstraint!
     
-    // MARK: - UI Elements
     private lazy var tableView: UITableView = {
         let table = UITableView()
         table.register(CategoryTableViewCell.self, forCellReuseIdentifier: "CategoryCell")
@@ -55,7 +53,6 @@ final class CategoryListViewController: UIViewController {
         return button
     }()
     
-    // MARK: - Initialization
     init(selectedCategory: String? = nil, viewModel: CategoryViewModel = CategoryViewModel()) {
         self.selectedCategory = selectedCategory
         self.viewModel = viewModel
@@ -66,7 +63,6 @@ final class CategoryListViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -81,7 +77,6 @@ final class CategoryListViewController: UIViewController {
         applyTheme()
     }
     
-    // MARK: - Private Methods
     private func setupUI() {
         title = Localizable.Category.title
         
@@ -98,22 +93,16 @@ final class CategoryListViewController: UIViewController {
     }
     
     private func applyTheme() {
-        // Фон экрана
         view.backgroundColor = .systemBackground
         
-        // Фон таблицы: в светлой — как раньше .backgroundDay, в темной — системный
         if traitCollection.userInterfaceStyle == .dark {
             tableView.backgroundColor = .secondarySystemBackground
         } else {
             tableView.backgroundColor = .backgroundDay
         }
         
-        // Плейсхолдеры
         placeholderLabel.textColor = .secondaryLabel
         
-        // Кнопка «Добавить категорию»:
-        // Светлая — черная с белым текстом (как было),
-        // Темная — белая с черным текстом (по макету).
         if traitCollection.userInterfaceStyle == .dark {
             addButton.backgroundColor = .white
             addButton.setTitleColor(.black, for: .normal)
@@ -254,7 +243,6 @@ extension CategoryListViewController: UITableViewDataSource, UITableViewDelegate
         return 75
     }
     
-    // MARK: - Context Menu
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let title = viewModel.getCategoryTitle(at: indexPath.row)
         

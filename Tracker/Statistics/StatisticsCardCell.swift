@@ -1,4 +1,4 @@
-// StatisticsCardCell.swift
+
 import UIKit
 
 final class StatisticsCardCell: UITableViewCell {
@@ -8,7 +8,6 @@ final class StatisticsCardCell: UITableViewCell {
     private let valueLabel = UILabel()
     private let titleLabel = UILabel()
     
-    // Градиент для рамки и маска-штрих по контуру
     private let gradientBorderLayer = CAGradientLayer()
     private let borderMaskLayer = CAShapeLayer()
     
@@ -31,7 +30,7 @@ final class StatisticsCardCell: UITableViewCell {
     
     override func didMoveToWindow() {
         super.didMoveToWindow()
-        // При первом появлении в иерархии гарантируем корректный фрейм градиента
+        
         layoutGradientBorder()
     }
     
@@ -48,7 +47,6 @@ final class StatisticsCardCell: UITableViewCell {
         cardView.backgroundColor = .secondarySystemBackground
         cardView.layer.cornerRadius = 16
         cardView.layer.masksToBounds = true
-        // обычную рамку убираем — вместо неё рисуем градиентную
         cardView.layer.borderWidth = 0
         cardView.layer.borderColor = nil
         
@@ -61,27 +59,23 @@ final class StatisticsCardCell: UITableViewCell {
         titleLabel.numberOfLines = 0
         titleLabel.lineBreakMode = .byWordWrapping
         
-        // Градиентная рамка (по всему периметру)
         gradientBorderLayer.type = .conic
         gradientBorderLayer.colors = [
             UIColor.systemRed.cgColor,
             UIColor.systemGreen.cgColor,
             UIColor.systemBlue.cgColor,
-            UIColor.systemRed.cgColor // замкнуть градиент
+            UIColor.systemRed.cgColor
         ]
         gradientBorderLayer.locations = [0.0, 0.5, 0.85, 1.0]
-        // центр градиента — центр карточки
         gradientBorderLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
         gradientBorderLayer.endPoint = CGPoint(x: 0.5, y: 0.0)
         gradientBorderLayer.needsDisplayOnBoundsChange = true
         gradientBorderLayer.contentsScale = UIScreen.main.scale
-        // поместим поверх слоёв сабвью
         gradientBorderLayer.zPosition = 999
         
-        // маска: штрих по скруглённому прямоугольнику
         borderMaskLayer.fillColor = UIColor.clear.cgColor
         borderMaskLayer.strokeColor = UIColor.black.cgColor
-        borderMaskLayer.lineWidth = 1 // чуть толще, чтобы было заметнее
+        borderMaskLayer.lineWidth = 1.5
         borderMaskLayer.lineJoin = .round
         borderMaskLayer.lineCap = .round
         
@@ -93,8 +87,6 @@ final class StatisticsCardCell: UITableViewCell {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         cardView.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Добавляем градиент уже после создания сабвью (на всякий случай)
         cardView.layer.addSublayer(gradientBorderLayer)
     }
     
@@ -117,10 +109,9 @@ final class StatisticsCardCell: UITableViewCell {
     }
     
     private func layoutGradientBorder() {
-        // Растягиваем градиент на всю карточку
+
         gradientBorderLayer.frame = cardView.bounds
         
-        // Путь по контуру со скруглением и лёгким inset, чтобы штрих не обрезался
         let inset: CGFloat = borderMaskLayer.lineWidth / 2
         let roundedRect = cardView.bounds.insetBy(dx: inset, dy: inset)
         borderMaskLayer.path = UIBezierPath(

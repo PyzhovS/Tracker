@@ -94,3 +94,7 @@
 "statistics.idealDays" = "Perfect days";
 "statistics.completedCount" = "Trackers completed";
 "statistics.averageValue" = "Average value";
+
+// Экран редактирования
+"editTracker.title" = "Edit habit";
+"editTracker.save" = "Save";

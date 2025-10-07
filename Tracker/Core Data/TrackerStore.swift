@@ -1,11 +1,14 @@
 import CoreData
 import UIKit
 
+// MARK: - TrackerStoreDelegate
 protocol TrackerStoreDelegate: AnyObject {
     func didUpdateTrackers()
 }
 
+// MARK: - TrackerStore
 final class TrackerStore: NSObject {
+    // MARK: - Properties
     weak var delegate: TrackerStoreDelegate?
     
     private let context: NSManagedObjectContext
@@ -13,6 +16,7 @@ final class TrackerStore: NSObject {
     
     private var isCoreDataReady = false
     
+    // MARK: - Initialization
     init(context: NSManagedObjectContext = CoreDataManager.shared.context) {
         self.context = context
         super.init()
@@ -27,6 +31,7 @@ final class TrackerStore: NSObject {
         checkCoreDataReadiness()
     }
     
+    // MARK: - Core Data Readiness
     private func checkCoreDataReadiness() {
         if context.persistentStoreCoordinator != nil {
             isCoreDataReady = true
@@ -40,6 +45,7 @@ final class TrackerStore: NSObject {
         }
     }
     
+    // MARK: - Fetched Results Controller
     private func setupFetchedResultsController() {
         let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
@@ -59,6 +65,7 @@ final class TrackerStore: NSObject {
         }
     }
     
+    // MARK: - Conversion
     func convertToTracker(from trackerCoreData: TrackerCoreData) -> Tracker? {
         guard
             let id = trackerCoreData.id,
@@ -87,6 +94,7 @@ final class TrackerStore: NSObject {
         )
     }
     
+    // MARK: - CRUD (Create/Read)
     func addTracker(_ tracker: Tracker, to categoryTitle: String) throws {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = tracker.id
@@ -117,12 +125,14 @@ final class TrackerStore: NSObject {
     }
 }
 
+// MARK: - NSFetchedResultsControllerDelegate
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.didUpdateTrackers()
     }
 }
 
+// MARK: - UIColor+Hex
 extension UIColor {
     convenience init?(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -172,6 +182,7 @@ extension UIColor {
     }
 }
 
+// MARK: - CRUD (Delete/Update)
 extension TrackerStore {
     func deleteTracker(_ tracker: Tracker) throws {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
@@ -183,7 +194,6 @@ extension TrackerStore {
         }
     }
     
-    // Старый метод оставлен для совместимости (обновляет без смены категории)
     func updateTracker(_ tracker: Tracker) throws {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
@@ -201,7 +211,6 @@ extension TrackerStore {
         }
     }
     
-    // Новый метод — обновление с изменением категории
     func updateTracker(_ tracker: Tracker, in categoryTitle: String) throws {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", tracker.id as CVarArg)
@@ -226,4 +235,3 @@ extension TrackerStore {
         }
     }
 }
-

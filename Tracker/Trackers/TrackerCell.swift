@@ -45,7 +45,6 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
-    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -56,7 +55,6 @@ final class TrackerCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private Methods
     private func setupUI() {
         contentView.backgroundColor = .systemBackground
         contentView.layer.cornerRadius = 12
@@ -73,7 +71,6 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupConstraints() {
-        
         let coloredViewHeight: CGFloat = 90
         
         NSLayoutConstraint.activate([
@@ -101,7 +98,6 @@ final class TrackerCell: UICollectionViewCell {
         ])
     }
     
-    // MARK: - Configuration
     func configure(with title: String, emoji: String, color: UIColor, completedDays: Int, isCompleted: Bool, isActive: Bool) {
         titleLabel.text = title
         emojiLabel.text = emoji

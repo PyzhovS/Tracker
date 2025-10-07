@@ -6,7 +6,7 @@ final class CategoryTableViewCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17)
-        label.textColor = .label // динамический (в светлой = черный)
+        label.textColor = .label
         label.numberOfLines = 1
         return label
     }()
@@ -21,7 +21,7 @@ final class CategoryTableViewCell: UITableViewCell {
     
     private let separatorView: UIView = {
         let view = UIView()
-        // цвет зададим в applyTheme(), чтобы отличать Light/Dark
+        
         return view
     }()
     
@@ -71,7 +71,7 @@ final class CategoryTableViewCell: UITableViewCell {
     }
     
     private func applyTheme() {
-        // Фон ячейки: в светлой — как раньше .backgroundDay, в темной — системный
+       
         if traitCollection.userInterfaceStyle == .dark {
             backgroundColor = .secondarySystemBackground
             contentView.backgroundColor = .secondarySystemBackground
@@ -82,7 +82,6 @@ final class CategoryTableViewCell: UITableViewCell {
             separatorView.backgroundColor = UIColor.gray.withAlphaComponent(0.3)
         }
         
-        // Текст и чекмарка
         titleLabel.textColor = .label
         checkmarkImageView.tintColor = .systemBlue
     }

@@ -1,6 +1,6 @@
 import UIKit
 
-// Приватная ячейка с кастомным разделителем
+
 private final class FilterOptionCell: UITableViewCell {
     static let reuseId = "FilterOptionCell"
 
@@ -84,17 +84,17 @@ final class FiltersViewController: UIViewController {
     
     private let selectedFilter: FilterType?
     
-    // Возможность настраивать толщину разделителя между ячейками
+
     var separatorThickness: CGFloat = 0.5 {
         didSet { tableView.reloadData() }
     }
     
-    // Таблица с контролируемой шириной и высотой по контенту
+
     private let tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .plain)
         tv.layer.cornerRadius = 16
         tv.layer.masksToBounds = true
-        tv.separatorStyle = .none // отключаем системные сепараторы
+        tv.separatorStyle = .none
         tv.tableFooterView = UIView()
         tv.isScrollEnabled = false
         if #available(iOS 15.0, *) {
@@ -147,7 +147,7 @@ final class FiltersViewController: UIViewController {
     
     private func applyTheme() {
         view.backgroundColor = .systemBackground
-        // Фон «карточки» таблицы: в темной теме затемняем
+     
         if traitCollection.userInterfaceStyle == .dark {
             tableView.backgroundColor = .secondarySystemBackground
         } else {
@@ -189,7 +189,7 @@ extension FiltersViewController: UITableViewDataSource, UITableViewDelegate {
         let isLast = indexPath.row == options.count - 1
         
         cell.configure(title: title, isLast: isLast, separatorHeight: separatorThickness)
-        cell.tintColor = .systemBlue // цвет галочки
+        cell.tintColor = .systemBlue
         
         if let selected = selectedFilter, selected.isActive, selected == type {
             cell.accessoryType = .checkmark

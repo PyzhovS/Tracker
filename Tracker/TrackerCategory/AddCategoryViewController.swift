@@ -1,19 +1,17 @@
 import UIKit
 
+// MARK: - AddCategoryViewController
 final class AddCategoryViewController: UIViewController {
     
-    // MARK: - Modes
+    // MARK: - Mode
     enum Mode {
         case create
         case edit(originalName: String)
     }
     
-    // MARK: - Properties
+    // MARK: - Callbacks
     var mode: Mode = .create
-    
-    // Колбэк для создания новой категории
     var onCategoryAdded: ((String) -> Void)?
-    // Колбэк для переименования: (старое имя, новое имя)
     var onCategoryRenamed: ((String, String) -> Void)?
     
     // MARK: - UI Elements
@@ -29,7 +27,7 @@ final class AddCategoryViewController: UIViewController {
     private lazy var textField: UITextField = {
         let field = UITextField()
         field.placeholder = Localizable.AddCategory.placeholder
-        field.backgroundColor = .backgroundDay // в светлой теме остается как было
+        field.backgroundColor = .backgroundDay
         field.layer.cornerRadius = 16
         field.layer.masksToBounds = true
         field.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
@@ -84,41 +82,16 @@ final class AddCategoryViewController: UIViewController {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         applyTheme()
-        // Пересчитываем внешний вид кнопки по текущему состоянию
         updateDoneButtonAppearance(enabled: doneButton.isEnabled)
     }
     
-    // MARK: - Private Methods
+    // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        
         view.addSubview(titleLabel)
         view.addSubview(textField)
         view.addSubview(doneButton)
-        
-        [titleLabel, textField, doneButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-        }
-    }
-    
-    private func applyTheme() {
-        view.backgroundColor = .systemBackground
-        titleLabel.textColor = .label
-        
-        // Поле ввода: светлая — как было, темная — системный заполнитель
-        if traitCollection.userInterfaceStyle == .dark {
-            textField.backgroundColor = .tertiarySystemFill
-            textField.keyboardAppearance = .dark
-        } else {
-            textField.backgroundColor = .backgroundDay
-            textField.keyboardAppearance = .light
-        }
-        textField.textColor = .label
-        textField.tintColor = .label
-        textField.attributedPlaceholder = NSAttributedString(
-            string: Localizable.AddCategory.placeholder,
-            attributes: [.foregroundColor: UIColor.secondaryLabel]
-        )
+        [titleLabel, textField, doneButton].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     }
     
     private func setupConstraints() {
@@ -144,6 +117,26 @@ final class AddCategoryViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
+    // MARK: - Theming
+    private func applyTheme() {
+        view.backgroundColor = .systemBackground
+        titleLabel.textColor = .label
+        if traitCollection.userInterfaceStyle == .dark {
+            textField.backgroundColor = .tertiarySystemFill
+            textField.keyboardAppearance = .dark
+        } else {
+            textField.backgroundColor = .backgroundDay
+            textField.keyboardAppearance = .light
+        }
+        textField.textColor = .label
+        textField.tintColor = .label
+        textField.attributedPlaceholder = NSAttributedString(
+            string: Localizable.AddCategory.placeholder,
+            attributes: [.foregroundColor: UIColor.secondaryLabel]
+        )
+    }
+    
+    // MARK: - Mode Handling
     private func applyMode() {
         switch mode {
         case .create:
@@ -152,7 +145,6 @@ final class AddCategoryViewController: UIViewController {
             textField.placeholder = Localizable.AddCategory.placeholder
             doneButton.isEnabled = false
             updateDoneButtonAppearance(enabled: false)
-            
         case .edit(let originalName):
             titleLabel.text = NSLocalizedString("editCategory.title", comment: "Edit category title")
             textField.text = originalName
@@ -160,6 +152,7 @@ final class AddCategoryViewController: UIViewController {
         }
     }
     
+    // MARK: - UI State
     private func updateDoneButtonAppearance(enabled: Bool) {
         if enabled {
             if traitCollection.userInterfaceStyle == .dark {
@@ -189,6 +182,7 @@ final class AddCategoryViewController: UIViewController {
         }
     }
     
+    // MARK: - Actions
     @objc private func hideKeyboard() {
         view.endEditing(true)
     }
@@ -201,7 +195,6 @@ final class AddCategoryViewController: UIViewController {
         guard let text = textField.text else { return }
         let name = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }
-        
         switch mode {
         case .create:
             onCategoryAdded?(name)

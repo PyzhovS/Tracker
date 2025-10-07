@@ -1,8 +1,10 @@
 import Foundation
 import UIKit
 
+// MARK: - TrackersViewController
 final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
+    // MARK: - Properties
     private let viewModel = TrackersViewModel()
     
     private var isSearching: Bool {
@@ -10,13 +12,14 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         return !text.isEmpty
     }
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupGestureRecognizer()
         applyTheme()
         UpdateUI()
         
-        // Bindings
         viewModel.onChange = { [weak self] in
             guard let self = self else { return }
             self.filtersButton.isHidden = !self.viewModel.shouldShowFiltersButton
@@ -30,8 +33,6 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         }
         
         viewModel.load()
-        
-        // восстановим фильтр на кнопке (если был)
         updateFilterButtonAppearance()
     }
     
@@ -52,10 +53,10 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        // При смене темы обновим оформление
         applyTheme()
     }
     
+    // MARK: - UI State
     private func UpdateUI() {
         let isEmpty = viewModel.sections.isEmpty
         placeholder.isHidden = !isEmpty
@@ -64,13 +65,18 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         
         if isEmpty {
             if viewModel.isFilterActive || isSearching {
+                // Пусто из-за фильтра/поиска — показываем картинку "filter"
+                placeholder.image = UIImage(named: "filter")
                 labelSearch.text = NSLocalizedString("empty.nothingFound", comment: "Nothing found")
             } else {
+                // Общее пустое состояние — оставляем картинку "error"
+                placeholder.image = UIImage(named: "error")
                 labelSearch.text = Localizable.Trackers.emptyTitle
             }
         }
     }
     
+    // MARK: - UI Components
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -152,6 +158,7 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         return button
     }()
     
+    // MARK: - Setup
     func setupUI() {
         view.addSubview(collectionView)
         view.addSubview(placeholder)
@@ -174,11 +181,20 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         setupConstraint()
     }
     
+    private func setupGestureRecognizer() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc private func hideKeyboard() {
+        view.endEditing(true)
+    }
+    
+    // MARK: - Theming
     private func applyTheme() {
-        // Фон экрана
         view.backgroundColor = .systemBackground
         
-        // Поиск
         if #available(iOS 13.0, *) {
             let tf = searchBar.searchTextField
             tf.backgroundColor = .tertiarySystemFill
@@ -191,28 +207,20 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
             tf.leftView?.tintColor = .secondaryLabel
         }
         
-        // Дата: светлую не трогаем; в темной — фон YP Gray Dark и черный текст.
         if traitCollection.userInterfaceStyle == .dark {
             datePicker.backgroundColor = UIColor(named: "YP Gray Dark") ?? .secondarySystemBackground
-            datePicker.overrideUserInterfaceStyle = .light   // черный текст в .compact
-            datePicker.tintColor = .black                    // акцентные элементы
+            datePicker.overrideUserInterfaceStyle = .light
+            datePicker.tintColor = .black
         } else {
             datePicker.backgroundColor = nil
             datePicker.overrideUserInterfaceStyle = .unspecified
             datePicker.tintColor = view.tintColor
         }
         
-        // Кнопка добавления
         addTracker.tintColor = .label
-        
-        // Текстовые цвета
         labelTitle.textColor = .label
         labelSearch.textColor = .secondaryLabel
-        
-        // Коллекция
         collectionView.backgroundColor = .clear
-        
-        // Кнопка фильтров (фон системный — сам адаптируется)
         updateFilterButtonAppearance()
     }
     
@@ -231,6 +239,7 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         }
     }
     
+    // MARK: - Actions
     @objc private func addTrackerTapped() {
         Analytics.shared.log(event: .click, screen: .main, item: .addTrack)
         
@@ -255,7 +264,6 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     private func applySelectedFilter(_ filter: FilterType) {
         switch filter {
         case .today:
-            // синхронизируем UI datePicker с VM
             let today = Date()
             datePicker.date = today
             viewModel.applyFilterOption(.today)
@@ -272,6 +280,7 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
         viewModel.setDate(datePicker.date)
     }
     
+    // MARK: - Layout
     func setupConstraint() {
         NSLayoutConstraint.activate([
             placeholder.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -318,6 +327,7 @@ final class TrackersViewController: UIViewController, UISearchBarDelegate {
     }
 }
 
+// MARK: - UICollectionViewDataSource & UICollectionViewDelegateFlowLayout
 extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return viewModel.sections.count
@@ -374,15 +384,8 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let itemsCount = viewModel.sections[section].items.count
-        
-        if itemsCount == 1 {
-            let cellWidth = (collectionView.bounds.width - 41) / 2
-            let extraRightInset = collectionView.bounds.width - 16 - cellWidth - 16
-            return UIEdgeInsets(top: 0, left: 16, bottom: 9, right: extraRightInset)
-        } else {
-            return UIEdgeInsets(top: 0, left: 16, bottom: 9, right: 16)
-        }
+
+        return UIEdgeInsets(top: 0, left: 16, bottom: 9, right: 16)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -398,6 +401,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
     }
 }
 
+// MARK: - UICollectionViewDelegate
 extension TrackersViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
@@ -457,13 +461,13 @@ extension TrackersViewController: UICollectionViewDelegate {
         return UITargetedPreview(view: cell.contentView, parameters: parameters)
     }
     
+    // MARK: - Editing & Deletion
     private func editTracker(_ item: TrackersViewModel.Item, at indexPath: IndexPath) {
         let editVC = NewTrackerViewController()
         let currentCategoryTitle = viewModel.sections[indexPath.section].title
         
-        // Восстанавливаем модель Tracker из item для редактирования, включая schedule
         let tracker = Tracker(id: item.id, title: item.title, emoji: item.emoji, color: item.color, schedule: item.schedule)
-        editVC.mode = .edit(tracker, currentCategoryTitle)
+        editVC.mode = .edit(tracker, currentCategoryTitle, item.completedDays)
         
         editVC.onTrackerUpdated = { [weak self] updatedTracker, categoryTitle in
             self?.viewModel.updateTracker(updatedTracker, in: categoryTitle)
@@ -491,6 +495,7 @@ extension TrackersViewController: UICollectionViewDelegate {
         present(alert, animated: true)
     }
     
+    // MARK: - Errors
     private func showError(_ message: String) {
         let alert = UIAlertController(
             title: Localizable.Alerts.errorTitle,

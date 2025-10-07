@@ -1,13 +1,16 @@
 import UIKit
 
+// MARK: - AppTabBarController
 class AppTabBarController: UITabBarController {
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewControllers()
         setupTabBarAppearance()
     }
     
+    // MARK: - Setup
     func setupViewControllers() {
         let trackerController = TrackersViewController()
         let firstVC = createNavController(for: trackerController,
@@ -39,6 +42,7 @@ class AppTabBarController: UITabBarController {
         }
     }
     
+    // MARK: - Factory
     private func createNavController(for rootViewController: UIViewController,
                                      title: String,
                                      image: UIImage) -> UIViewController {

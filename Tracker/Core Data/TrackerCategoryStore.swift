@@ -75,7 +75,7 @@ final class TrackerCategoryStore {
     
     // MARK: - Rename & Delete
     func renameCategory(from oldTitle: String, to newTitle: String) throws {
-        // Проверка на дубль нового названия
+    
         if oldTitle != newTitle {
             let dupRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
             dupRequest.predicate = NSPredicate(format: "title == %@", newTitle)

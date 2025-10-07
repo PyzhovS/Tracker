@@ -99,3 +99,7 @@
 "statistics.idealDays" = "Идеальные дни";
 "statistics.completedCount" = "Трекеров завершено";
 "statistics.averageValue" = "Среднее значение";
+
+// Экран редактирования
+"editTracker.title" = "Редактирование привычки";
+"editTracker.save" = "Сохранить";
