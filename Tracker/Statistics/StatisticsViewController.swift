@@ -1,4 +1,3 @@
-// StatisticsViewController.swift
 import UIKit
 
 final class StatisticsViewController: UIViewController {
