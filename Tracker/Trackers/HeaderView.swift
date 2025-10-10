@@ -5,7 +5,8 @@ final class HeaderView: UICollectionReusableView {
     let titleLabel = UILabel()
     override init(frame: CGRect) {
         super.init(frame: frame)
-        titleLabel.textColor = .black
+        backgroundColor = .clear
+        titleLabel.textColor = .label
         titleLabel.font = UIFont.boldSystemFont(ofSize: 19)
         addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false

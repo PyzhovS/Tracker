@@ -1,0 +1,100 @@
+/* Common */
+"common.done" = "Done";
+"common.cancel" = "Cancel";
+"common.ok" = "OK";
+"common.errorGeneric" = "An error occurred";
+
+/* Alerts */
+"alerts.errorTitle" = "Error";
+
+/* Errors */
+"errors.categoryAlreadyExists" = "A category with this name already exists";
+"errors.failedToSave" = "Failed to save category";
+"errors.failedToFetch" = "Failed to load categories";
+"errors.failedToDelete" = "Failed to delete tracker";
+"errors.failedToUpdate" = "Failed to update tracker";
+
+/* Weekday full names */
+"weekday.monday" = "Monday";
+"weekday.tuesday" = "Tuesday";
+"weekday.wednesday" = "Wednesday";
+"weekday.thursday" = "Thursday";
+"weekday.friday" = "Friday";
+"weekday.saturday" = "Saturday";
+"weekday.sunday" = "Sunday";
+
+/* Weekday short names */
+"weekdayShort.monday" = "Mon";
+"weekdayShort.tuesday" = "Tue";
+"weekdayShort.wednesday" = "Wed";
+"weekdayShort.thursday" = "Thu";
+"weekdayShort.friday" = "Fri";
+"weekdayShort.saturday" = "Sat";
+"weekdayShort.sunday" = "Sun";
+
+/* Add Category */
+"addCategory.title" = "New category";
+"addCategory.placeholder" = "Enter a category name";
+
+/* Schedule */
+"schedule.title" = "Schedule";
+
+/* Category screen */
+"category.title" = "Category";
+"category.placeholderText" = "Habits and events can\ngrouped by meaning";
+"category.addButton" = "Add category";
+
+/* New Tracker */
+"newTracker.title" = "New habit";
+"newTracker.namePlaceholder" = "Enter tracker name";
+"newTracker.emojiTitle" = "Emoji";
+"newTracker.colorTitle" = "Color";
+"newTracker.create" = "Create";
+"newTracker.category" = "Category";
+"newTracker.schedule" = "Schedule";
+"newTracker.everyDay" = "Every day";
+
+/* Onboarding */
+"onboarding.actionButton" = "What a technology!";
+"onboarding.page1.title" = "Track only what you want";
+"onboarding.page2.title" = "Even if it’s not liters of water and yoga";
+
+/* Trackers */
+"trackers.title" = "Trackers";
+"trackers.searchPlaceholder" = "Search";
+"trackers.emptyTitle" = "What shall we track?";
+
+/* Tab Bar */
+"trackers.tabbar" = "Trackers";
+"statistics.tabbar" = "Statistics";
+
+/* Filters */
+"filters.title" = "Filters";
+"filters.button" = "Filters";
+"filters.all" = "All trackers";
+"filters.today" = "Trackers for today";
+"filters.completed" = "Completed";
+"filters.incompleted" = "Not completed";
+
+/* Empty states */
+"empty.nothingFound" = "Nothing found";
+
+/* Context Menu */
+"contextMenu.edit" = "Edit";
+"contextMenu.delete" = "Delete";
+
+/* Alerts */
+"alerts.deleteTitle" = "Delete tracker?";
+"alerts.deleteMessage" = "This action cannot be undone";
+
+/* Statistics */
+"statistics.title" = "Statistics";
+"statistics.empty" = "Nothing to analyze yet";
+"statistics.bestPeriod" = "Best period";
+"statistics.idealDays" = "Perfect days";
+"statistics.completedCount" = "Trackers completed";
+"statistics.averageValue" = "Average value";
+
+// Экран редактирования
+"editTracker.title" = "Edit habit";
+"editTracker.save" = "Save";

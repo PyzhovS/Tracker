@@ -3,18 +3,17 @@ import UIKit
 
 final class ScheduleSelectionViewController: UIViewController {
     
-    // MARK: - Properties
     var selectedDays: [WeekDay] = []
     var onScheduleSelected: (([WeekDay]) -> Void)?
     
     private let daysOfWeek = WeekDay.allCases
     
-    // MARK: - UI Elements
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Расписание"
+        label.text = Localizable.Schedule.title
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
+        label.textColor = .label
         return label
     }()
     
@@ -34,7 +33,7 @@ final class ScheduleSelectionViewController: UIViewController {
     
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(Localizable.Common.done, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .black
@@ -42,17 +41,21 @@ final class ScheduleSelectionViewController: UIViewController {
         return button
     }()
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
         setupActions()
+        applyTheme()
     }
     
-    // MARK: - Private Methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
+    }
+    
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.addSubview(titleLabel)
         view.addSubview(tableView)
         view.addSubview(doneButton)
@@ -61,6 +64,21 @@ final class ScheduleSelectionViewController: UIViewController {
          tableView,
          doneButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false}
+    }
+    
+    private func applyTheme() {
+        view.backgroundColor = .systemBackground
+        titleLabel.textColor = .label
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            tableView.backgroundColor = .secondarySystemBackground
+            doneButton.backgroundColor = .white
+            doneButton.setTitleColor(.black, for: .normal)
+        } else {
+            tableView.backgroundColor = .systemBackground
+            doneButton.backgroundColor = .black
+            doneButton.setTitleColor(.white, for: .normal)
+        }
     }
     
     private func setupConstraints() {
@@ -88,8 +106,6 @@ final class ScheduleSelectionViewController: UIViewController {
         onScheduleSelected?(selectedDays)
         dismiss(animated: true)
     }
-    
-    
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate

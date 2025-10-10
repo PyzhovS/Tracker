@@ -38,7 +38,7 @@ final class OnboardingViewController: UIViewController {
         titleLabel.numberOfLines = 0
         titleLabel.textColor = .black
         
-        actionButton.setTitle("Вот это технологии!", for: .normal)
+        actionButton.setTitle(Localizable.Onboarding.actionButton, for: .normal)
         actionButton.setTitleColor(.white, for: .normal)
         actionButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         actionButton.backgroundColor = .black
@@ -81,3 +81,4 @@ final class OnboardingViewController: UIViewController {
         }
     }
 }
+

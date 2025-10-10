@@ -2,12 +2,10 @@ import UIKit
 
 final class CategoryListViewController: UIViewController {
     
-    // MARK: - Properties
     let viewModel: CategoryViewModel
     private var selectedCategory: String?
     private var tableViewHeightConstraint: NSLayoutConstraint!
     
-    // MARK: - UI Elements
     private lazy var tableView: UITableView = {
         let table = UITableView()
         table.register(CategoryTableViewCell.self, forCellReuseIdentifier: "CategoryCell")
@@ -16,7 +14,6 @@ final class CategoryListViewController: UIViewController {
         table.layer.cornerRadius = 16
         table.layer.masksToBounds = true
         table.separatorStyle = .none
-        table.backgroundColor = .backgroundDay
         table.isScrollEnabled = false
         return table
     }()
@@ -39,26 +36,23 @@ final class CategoryListViewController: UIViewController {
     
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно\nобъединить по смыслу"
+        label.text = Localizable.Category.placeholderText
         label.font = UIFont.systemFont(ofSize: 12)
         label.textAlignment = .center
         label.numberOfLines = 2
-        label.textColor = .black
+        label.textColor = .secondaryLabel
         return label
     }()
     
     private lazy var addButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(Localizable.Category.addButton, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.backgroundColor = .black
-        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         return button
     }()
     
-    // MARK: - Initialization
     init(selectedCategory: String? = nil, viewModel: CategoryViewModel = CategoryViewModel()) {
         self.selectedCategory = selectedCategory
         self.viewModel = viewModel
@@ -69,19 +63,22 @@ final class CategoryListViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
         setupBindings()
+        applyTheme()
         viewModel.loadCategories()
     }
     
-    // MARK: - Private Methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
+    }
+    
     private func setupUI() {
-        view.backgroundColor = .white
-        title = "Категория"
+        title = Localizable.Category.title
         
         placeholderStackView.addArrangedSubview(placeholderImageView)
         placeholderStackView.addArrangedSubview(placeholderLabel)
@@ -95,6 +92,26 @@ final class CategoryListViewController: UIViewController {
         }
     }
     
+    private func applyTheme() {
+        view.backgroundColor = .systemBackground
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            tableView.backgroundColor = .secondarySystemBackground
+        } else {
+            tableView.backgroundColor = .backgroundDay
+        }
+        
+        placeholderLabel.textColor = .secondaryLabel
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            addButton.backgroundColor = .white
+            addButton.setTitleColor(.black, for: .normal)
+        } else {
+            addButton.backgroundColor = .black
+            addButton.setTitleColor(.white, for: .normal)
+        }
+    }
+    
     private func setupConstraints() {
         tableViewHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 150)
         
@@ -102,14 +119,13 @@ final class CategoryListViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableViewHeightConstraint, 
+            tableViewHeightConstraint,
             
             placeholderStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             placeholderStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -50),
             
             placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
             placeholderImageView.heightAnchor.constraint(equalToConstant: 80),
-            
             
             addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -148,13 +164,14 @@ final class CategoryListViewController: UIViewController {
     }
     
     private func showError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        let alert = UIAlertController(title: Localizable.Alerts.errorTitle, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Localizable.Common.ok, style: .default))
         present(alert, animated: true)
     }
     
     @objc private func addButtonTapped() {
         let addCategoryVC = AddCategoryViewController()
+        addCategoryVC.mode = .create
         addCategoryVC.onCategoryAdded = { [weak self] categoryName in
             self?.viewModel.addNewCategory(title: categoryName)
             self?.selectedCategory = categoryName
@@ -163,6 +180,35 @@ final class CategoryListViewController: UIViewController {
         }
         
         navigationController?.pushViewController(addCategoryVC, animated: true)
+    }
+    
+    private func presentEditController(for oldTitle: String) {
+        let editVC = AddCategoryViewController()
+        editVC.mode = .edit(originalName: oldTitle)
+        editVC.onCategoryRenamed = { [weak self] old, new in
+            guard let self = self else { return }
+            self.viewModel.renameCategory(oldTitle: old, newTitle: new)
+            if self.selectedCategory == old {
+                self.selectedCategory = new
+            }
+        }
+        navigationController?.pushViewController(editVC, animated: true)
+    }
+    
+    private func confirmDeletion(title: String) {
+        let alert = UIAlertController(
+            title: Localizable.Alerts.deleteTitle,
+            message: Localizable.Alerts.deleteMessage,
+            preferredStyle: .actionSheet
+        )
+        alert.addAction(UIAlertAction(title: Localizable.Common.delete, style: .destructive) { [weak self] _ in
+            self?.viewModel.deleteCategory(title: title)
+            if self?.selectedCategory == title {
+                self?.selectedCategory = nil
+            }
+        })
+        alert.addAction(UIAlertAction(title: Localizable.Common.cancel, style: .cancel))
+        present(alert, animated: true)
     }
 }
 
@@ -195,5 +241,28 @@ extension CategoryListViewController: UITableViewDataSource, UITableViewDelegate
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let title = viewModel.getCategoryTitle(at: indexPath.row)
+        
+        return UIContextMenuConfiguration(identifier: indexPath as NSIndexPath, previewProvider: nil) { [weak self] _ in
+            guard let self = self else { return UIMenu() }
+            
+            let editAction = UIAction(
+                title: NSLocalizedString("contextMenu.edit", comment: "Edit")
+            ) { _ in
+                self.presentEditController(for: title)
+            }
+            
+            let deleteAction = UIAction(
+                title: Localizable.Common.delete,
+                attributes: .destructive
+            ) { _ in
+                self.confirmDeletion(title: title)
+            }
+            
+            return UIMenu(title: "", children: [editAction, deleteAction])
+        }
     }
 }

@@ -5,6 +5,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         _ = CoreDataManager.shared.persistentContainer
+        
+        // Активация аналитики через обёртку
+        Analytics.shared.activate(apiKey: "839135fb-5482-4d0c-995a-ae8b08a9f259")
+        
         return true
     }
     
@@ -22,4 +26,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         CoreDataManager.shared.saveContext()
     }
 }
-

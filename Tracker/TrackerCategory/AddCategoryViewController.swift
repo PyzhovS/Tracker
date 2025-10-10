@@ -1,23 +1,32 @@
-
 import UIKit
 
+// MARK: - AddCategoryViewController
 final class AddCategoryViewController: UIViewController {
     
-    // MARK: - Properties
+    // MARK: - Mode
+    enum Mode {
+        case create
+        case edit(originalName: String)
+    }
+    
+    // MARK: - Callbacks
+    var mode: Mode = .create
     var onCategoryAdded: ((String) -> Void)?
+    var onCategoryRenamed: ((String, String) -> Void)?
     
     // MARK: - UI Elements
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая категория"
+        label.text = Localizable.AddCategory.title
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
+        label.textColor = .label
         return label
     }()
     
     private lazy var textField: UITextField = {
         let field = UITextField()
-        field.placeholder = "Введите название категории"
+        field.placeholder = Localizable.AddCategory.placeholder
         field.backgroundColor = .backgroundDay
         field.layer.cornerRadius = 16
         field.layer.masksToBounds = true
@@ -26,13 +35,14 @@ final class AddCategoryViewController: UIViewController {
         field.font = UIFont.systemFont(ofSize: 17)
         field.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         field.returnKeyType = .done
+        field.clearButtonMode = .whileEditing
         field.delegate = self
         return field
     }()
     
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(Localizable.Common.done, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
@@ -48,11 +58,12 @@ final class AddCategoryViewController: UIViewController {
         setupUI()
         setupConstraints()
         setupGestureRecognizer()
+        applyMode()
+        applyTheme()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Скрываем navigation bar при появлении
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
@@ -68,17 +79,19 @@ final class AddCategoryViewController: UIViewController {
         }
     }
     
-    // MARK: - Private Methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        applyTheme()
+        updateDoneButtonAppearance(enabled: doneButton.isEnabled)
+    }
+    
+    // MARK: - Setup
     private func setupUI() {
-        view.backgroundColor = .white
-        
+        view.backgroundColor = .systemBackground
         view.addSubview(titleLabel)
         view.addSubview(textField)
         view.addSubview(doneButton)
-        
-        [titleLabel, textField, doneButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-        }
+        [titleLabel, textField, doneButton].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     }
     
     private func setupConstraints() {
@@ -104,25 +117,90 @@ final class AddCategoryViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     
+    // MARK: - Theming
+    private func applyTheme() {
+        view.backgroundColor = .systemBackground
+        titleLabel.textColor = .label
+        if traitCollection.userInterfaceStyle == .dark {
+            textField.backgroundColor = .tertiarySystemFill
+            textField.keyboardAppearance = .dark
+        } else {
+            textField.backgroundColor = .backgroundDay
+            textField.keyboardAppearance = .light
+        }
+        textField.textColor = .label
+        textField.tintColor = .label
+        textField.attributedPlaceholder = NSAttributedString(
+            string: Localizable.AddCategory.placeholder,
+            attributes: [.foregroundColor: UIColor.secondaryLabel]
+        )
+    }
+    
+    // MARK: - Mode Handling
+    private func applyMode() {
+        switch mode {
+        case .create:
+            titleLabel.text = Localizable.AddCategory.title
+            textField.text = ""
+            textField.placeholder = Localizable.AddCategory.placeholder
+            doneButton.isEnabled = false
+            updateDoneButtonAppearance(enabled: false)
+        case .edit(let originalName):
+            titleLabel.text = NSLocalizedString("editCategory.title", comment: "Edit category title")
+            textField.text = originalName
+            validate(text: originalName)
+        }
+    }
+    
+    // MARK: - UI State
+    private func updateDoneButtonAppearance(enabled: Bool) {
+        if enabled {
+            if traitCollection.userInterfaceStyle == .dark {
+                doneButton.backgroundColor = .white
+                doneButton.setTitleColor(.black, for: .normal)
+            } else {
+                doneButton.backgroundColor = .black
+                doneButton.setTitleColor(.white, for: .normal)
+            }
+        } else {
+            doneButton.backgroundColor = .ypGray
+            doneButton.setTitleColor(.white, for: .normal)
+        }
+    }
+    
+    private func validate(text: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch mode {
+        case .create:
+            let enabled = !trimmed.isEmpty
+            doneButton.isEnabled = enabled
+            updateDoneButtonAppearance(enabled: enabled)
+        case .edit(let originalName):
+            let enabled = !trimmed.isEmpty && trimmed != originalName
+            doneButton.isEnabled = enabled
+            updateDoneButtonAppearance(enabled: enabled)
+        }
+    }
+    
+    // MARK: - Actions
     @objc private func hideKeyboard() {
         view.endEditing(true)
     }
     
     @objc private func textFieldDidChange() {
-        let text = textField.text ?? ""
-        let isNameEntered = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        
-        doneButton.isEnabled = isNameEntered
-        doneButton.backgroundColor = isNameEntered ? .black : .ypGray
+        validate(text: textField.text ?? "")
     }
     
     @objc private func doneButtonTapped() {
-        guard let categoryName = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !categoryName.isEmpty else {
-            return
+        guard let text = textField.text else { return }
+        let name = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return }
+        switch mode {
+        case .create:
+            onCategoryAdded?(name)
+        case .edit(let originalName):
+            onCategoryRenamed?(originalName, name)
         }
-        
-        onCategoryAdded?(categoryName)
         dismiss(animated: true)
     }
 }

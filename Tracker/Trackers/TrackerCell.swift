@@ -16,7 +16,7 @@ final class TrackerCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
-        label.backgroundColor = .white.withAlphaComponent(0.3)
+        label.backgroundColor = UIColor.white.withAlphaComponent(0.3)
         label.layer.cornerRadius = 12
         label.clipsToBounds = true
         return label
@@ -33,7 +33,7 @@ final class TrackerCell: UICollectionViewCell {
     private let daysLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 12)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -45,7 +45,6 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
-    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -56,9 +55,8 @@ final class TrackerCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private Methods
     private func setupUI() {
-        contentView.backgroundColor = .white
+        contentView.backgroundColor = .systemBackground
         contentView.layer.cornerRadius = 12
         contentView.clipsToBounds = true
         
@@ -73,7 +71,6 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupConstraints() {
-        
         let coloredViewHeight: CGFloat = 90
         
         NSLayoutConstraint.activate([
@@ -101,12 +98,11 @@ final class TrackerCell: UICollectionViewCell {
         ])
     }
     
-    // MARK: - Configuration
-    func configure(with title: String, emoji: String, color: UIColor, completedDays: Int, isCompleted: Bool,isActive: Bool) {
+    func configure(with title: String, emoji: String, color: UIColor, completedDays: Int, isCompleted: Bool, isActive: Bool) {
         titleLabel.text = title
         emojiLabel.text = emoji
         coloredView.backgroundColor = color
-        daysLabel.text = "\(completedDays) дней"
+        daysLabel.text = Localizable.Dates.daysCount(completedDays)
         plusButton.setImage(UIImage(systemName: isCompleted ? "checkmark" : "plus"), for: .normal)
         plusButton.backgroundColor = coloredView.backgroundColor
         plusButton.isEnabled = isActive

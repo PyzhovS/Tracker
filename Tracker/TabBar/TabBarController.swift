@@ -1,20 +1,25 @@
 import UIKit
 
+// MARK: - AppTabBarController
 class AppTabBarController: UITabBarController {
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewControllers()
         setupTabBarAppearance()
     }
     
+    // MARK: - Setup
     func setupViewControllers() {
         let trackerController = TrackersViewController()
         let firstVC = createNavController(for: trackerController,
-                                          title: "Трекеры",
+                                          title: Localizable.Tabbar.trackers,
                                           image: UIImage(resource: .tab1))
-        let thirdVC = createNavController(for: ThirdViewController(),
-                                          title: "Статистика",
+        
+        let statisticsController = StatisticsViewController()
+        let thirdVC = createNavController(for: statisticsController,
+                                          title: Localizable.Tabbar.statistics,
                                           image: UIImage(resource: .tab2))
         
         viewControllers = [firstVC, thirdVC]
@@ -37,6 +42,7 @@ class AppTabBarController: UITabBarController {
         }
     }
     
+    // MARK: - Factory
     private func createNavController(for rootViewController: UIViewController,
                                      title: String,
                                      image: UIImage) -> UIViewController {
@@ -44,13 +50,5 @@ class AppTabBarController: UITabBarController {
         navController.tabBarItem.title = title
         navController.tabBarItem.image = image
         return navController
-    }
-}
-
-// MARK: - ThirdViewController
-class ThirdViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
     }
 }
